@@ -462,7 +462,7 @@ for i=1:length(Deploy_queue)
         % oxygen concentration; record this and other relevant data in
         % AutoBOD_segmeans
         
-        for l=1:length(Segs_this_bottle)
+        for l=1:length(Segs_this_Bottle)
             
             % Get indices to data for this bottle and segment
             
@@ -471,7 +471,7 @@ for i=1:length(Deploy_queue)
             
             % ****** Segment number ******
                         
-            AutoBOD_segmeans.Segment(Seg_count) = Segs_this_bottle(l);
+            AutoBOD_segmeans.Segment(Seg_count) = Segs_this_Bottle(l);
             
             % ****** Bottle ID ******
             
@@ -512,31 +512,23 @@ for i=1:length(Deploy_queue)
             
             Sal_comp_factors = exp(Sal_this_bottle*(...
                 B_0+...
-                B_1*Scaled_temps+...
-                B_2.*(Scaled_temps.^2)+...
-                B_3.*(Scaled_temps.^3))+...
+                B_1*Scaled_temp+...
+                B_2.*(Scaled_temp.^2)+...
+                B_3.*(Scaled_temp.^3))+...
                 C_0*(Sal_this_bottle^2));
             
             % Compute salinity-corrected DO concentrations in umol/L
             
-            DO_uM_O2_salcor = AutoBOD_data.DO_uM_O2_uncorr(Ind_segdata).*Sal_comp_factors;
+            DO_uM_O2_salcor = AutoBOD_data.DO_uM_O2_uncorr(Ind_segdata).*Sal_comp_factor;
             
             % Calculate mean and sd and store
             
-            AutoBOD_segmeans.DO_uM_O2_mean(Seg_count) = mean(DO_uM_O2_salcor);
-            AutoBOD_segmeans.DO_uM_O2_sigma(Seg_count) = std(DO_uM_O2_salcor);
-            
-            % Lastly, advance our counter
-            
-            Seg_count = Seg_count+1;
+            AutoBOD_segmeans.DO_uM_O2_mean(Seg_count
+            AutoBOD_segmeans.DO_uM_O2_sigma(Seg_count)
             
         end
         
     end
-    
-    
-    
-    
             
 end
 

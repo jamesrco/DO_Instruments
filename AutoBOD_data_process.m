@@ -32,9 +32,25 @@
 %   1.  Amplitude (signal amplitude in uV)
 %   2.  Phase (signal phase shift)
 %   3.  Temperature (deg C)
-%   4.  Oxygen concentration (mg/L?)
-%       ******** NOTE that as of 9/8/15 we still don't know definitively
-%       what these units are ********
+%   4.  Oxygen concentration (for AutoBOD deployments prior to 9/10/15,
+%       these values are in % saturation with the decimal two places from
+%       the right termination of the string)
+%
+%       Units and decimal position are specified by the PreSens OEM unit
+%       settings oxyu and ores. The values of these two settings at the
+%       time of a given deployment should be recorded by user in the
+%       deployment metadata spreadsheet.
+%       
+%       oxyu                      ores (for an example measurement "2341")
+%       0*      % air sat         0     2341
+%       1       % O2              1     234.1
+%       2       hPa               2*    23.41
+%       3       Torr              3     2.341
+%       4       mg/L (ppm)        4     0.2341
+%       5       micromoles per L
+%
+%       * OEM unit defaults
+%
 %   5.  "Error" (a "0" indicates that the unit is in range; '4' or
 %       'amplitude too low' is a common error when light source does not
 %       see a dot)
@@ -79,9 +95,9 @@ AutoBOD_LogFile = '/Users/jrcollins/Dropbox/Cruises & projects/PHORCYS & AutoBOD
 % Deployment_metadata field "Deployment_ID"; if left unspecified, script
 % will run through all deployments in the log file
 
-Desired_Deployments = ['KOK1507_MC_2'];
+%Desired_Deployments = ['Iselin_PHORCYS_2015_2'];
 
-Max_RECD = 6; % The maximum allowable read error code deviations
+Max_RECD = 15; % The maximum allowable read error code deviations
               % this is the maximum number of bad reads allowable in a
               % stretch of "good" data (i.e., when locked onto a spot in a
               % particular bottle), or the number of erroneously good reads
@@ -110,10 +126,13 @@ C_0 = -3.11680E-07;
 % Flow fields into cell array AutoBOD_deploy_metadata
 
 % Easy fields first
-AutoBOD_deploy_metadata.Deployment_ID = cellstr(raw_deploy(7:end,1));
-AutoBOD_deploy_metadata.Cruise_ID = cellstr(txt_deploy(7:end,2));
-AutoBOD_deploy_metadata.Incu_temp_deg_C = cell2mat(raw_deploy(7:end,5));
-AutoBOD_deploy_metadata.Datafile_loc = cellstr(raw_deploy(7:end,6));
+AutoBOD_deploy_metadata.Deployment_ID = cellstr(raw_deploy(9:end,1));
+AutoBOD_deploy_metadata.Cruise_ID = cellstr(txt_deploy(9:end,2));
+AutoBOD_deploy_metadata.Incu_temp_deg_C = cell2mat(raw_deploy(9:end,5));
+AutoBOD_deploy_metadata.Datafile_loc = cellstr(raw_deploy(9:end,6));
+AutoBOD_deploy_metadata.Presens_ores = cell2mat(raw_deploy(9:end,8));
+AutoBOD_deploy_metadata.Presens_oxyu = cell2mat(raw_deploy(9:end,7));
+AutoBOD_deploy_metadata.Baro_press_hPa = cell2mat(raw_deploy(9:end,9));
 AutoBOD_bottle_metadata.Deployment_ID = cellstr(raw_bottle(6:end,1));
 AutoBOD_bottle_metadata.Bottle_ID = cell2mat(raw_bottle(6:end,2));
 AutoBOD_bottle_metadata.Sample_ID = cellstr(raw_bottle(6:end,3));
@@ -130,23 +149,52 @@ NumDeploys = length(AutoBOD_deploy_metadata.Deployment_ID);
 % Now, the fields requiring a bit more manipulation
 
 % Time zone
-AutoBOD_deploy_metadata.Incu_timezone = regexp(raw_deploy(7:end,3),'.{6}$','match');
+AutoBOD_deploy_metadata.Incu_timezone = regexp(raw_deploy(9:end,3),'.{6}$','match');
 AutoBOD_deploy_metadata.Incu_timezone = ...
     reshape([AutoBOD_deploy_metadata.Incu_timezone{:}],NumDeploys,1);
 
 % Incubation start/endtimes
-AutoBOD_deploy_metadata.Incu_starttime_UTC = datetime(raw_deploy(7:end,3),...
+AutoBOD_deploy_metadata.Incu_starttime_UTC = datetime(raw_deploy(9:end,3),...
     'InputFormat','uuuu-MM-dd''T''HH:mm:ssXXX','TimeZone','UTC');
-AutoBOD_deploy_metadata.Incu_endtime_UTC = datetime(raw_deploy(7:end,4),...
+AutoBOD_deploy_metadata.Incu_endtime_UTC = datetime(raw_deploy(9:end,4),...
     'InputFormat','uuuu-MM-dd''T''HH:mm:ssXXX','TimeZone','UTC');
+
+% Start/endtimes to be used for calculation of respiration rates (if given)
+
+for i=1:length(AutoBOD_deploy_metadata.Deployment_ID)
+    
+    if strcmp([txt_deploy(8+i,10)],'')
+        
+        % No specific calculation timepoints were specified, just use
+        % deployment start/end points
+        
+        AutoBOD_deploy_metadata.Calc_starttime_UTC(i) = AutoBOD_deploy_metadata.Incu_starttime_UTC(i);
+        AutoBOD_deploy_metadata.Calc_endtime_UTC(i) = AutoBOD_deploy_metadata.Incu_endtime_UTC(i);
+        
+    else
+        
+        % The user specified some calculation start/end points
+        
+        AutoBOD_deploy_metadata.Calc_starttime_UTC(i) = datetime(raw_deploy(8+i,10),...
+            'InputFormat','uuuu-MM-dd''T''HH:mm:ssXXX','TimeZone','UTC');
+        AutoBOD_deploy_metadata.Calc_endtime_UTC(i) = datetime(raw_deploy(8+i,11),...
+            'InputFormat','uuuu-MM-dd''T''HH:mm:ssXXX','TimeZone','UTC');
+        
+    end
+    
+end
+
+clear i;
 
 % Create some other timestamps in local time (relative to where deployment
 % took place)
 
-% Not creating these as a datetime object, since it appears the entire
+% Not creating these as datetime objects, since it appears the entire
 % object has to have the same time zone associated with it; this not
 % acceptable for our purposes since many of the deployments were conducted
 % in different time zones
+
+% Deployment times
 
 for i=1:length(AutoBOD_deploy_metadata.Deployment_ID)
     AutoBOD_deploy_metadata.Incu_starttime_local{i} = ...
@@ -159,23 +207,52 @@ end
 
 clear i
 
+% Times to be used for calculation of rates
+
+for i=1:length(AutoBOD_deploy_metadata.Deployment_ID)
+    AutoBOD_deploy_metadata.Calc_starttime_local{i} = ...
+        datestr(datetime(AutoBOD_deploy_metadata.Calc_starttime_UTC(i),'TimeZone',...
+        AutoBOD_deploy_metadata.Incu_timezone{i}));
+    AutoBOD_deploy_metadata.Calc_endtime_local{i} = ...
+        datestr(datetime(AutoBOD_deploy_metadata.Calc_endtime_UTC(i),'TimeZone',...
+        AutoBOD_deploy_metadata.Incu_timezone{i}));
+end
+
+clear i
+
 % Calculate deployment durations
 AutoBOD_deploy_metadata.Deploy_duration_hours = ...
     AutoBOD_deploy_metadata.Incu_endtime_UTC - ...
     AutoBOD_deploy_metadata.Incu_starttime_UTC;
 
-% Finally, create vector of deployments to be analyzed
+% Calculate durations of data range over which rates are to be calculated
+AutoBOD_deploy_metadata.Calcrange_duration_hours = ...
+    AutoBOD_deploy_metadata.Calc_endtime_UTC - ...
+    AutoBOD_deploy_metadata.Calc_starttime_UTC;
+
+% Create vector of deployments to be analyzed
 if (exist('Desired_Deployments') & ~isempty('Desired_Deployments'))
     Deploy_queue = cellstr(Desired_Deployments);
 else
     Deploy_queue = unique(AutoBOD_deploy_metadata.Deployment_ID);
 end
 
+% Finally, preallocate some elements of a structure AutoBOD_rate_results
+% into which we will flow our rate calculations
+
+AutoBOD_rate_results.Deployment_ID = num2cell(NaN(length(AutoBOD_bottle_metadata.Deployment_ID),1));
+AutoBOD_rate_results.Bottle_ID = NaN(length(AutoBOD_bottle_metadata.Deployment_ID),1);
+AutoBOD_rate_results.Sample_ID = num2cell(NaN(length(AutoBOD_bottle_metadata.Deployment_ID),1));
+AutoBOD_rate_results.Sample_replicate = NaN(length(AutoBOD_bottle_metadata.Deployment_ID),1);
+AutoBOD_rate_results.dO2dt_umol_L_d = NaN(length(AutoBOD_bottle_metadata.Deployment_ID),1);
+AutoBOD_rate_results.dO2dt_umol_L_d_sigma = NaN(length(AutoBOD_bottle_metadata.Deployment_ID),1);
+
 %% Analysis, for each desired deployment in Deployment_queue
 
 for i=1:length(Deploy_queue)
     
 %     %% Pull out bottle metadata for this deployment
+%     % Doesn't look like we need this anymore (9/10/15)
 %     
 %     % Store in AutoBOD_bottle_metadata_thisdeploy
 %     
@@ -264,18 +341,50 @@ for i=1:length(Deploy_queue)
     
     % ****** DO ******
     
-    % Read in raw, salinity uncorrected concentration in (we assume) mg/L
-    % ****** NOTE: Could actually be %sat with the decimal in a weird place
+    % Read in raw, salinity uncorrected value
     
-    AutoBOD_data.DO_mg_L_uncorr = AutoBOD_rawdata{4};
+    AutoBOD_data.DO_uncorr = AutoBOD_rawdata{4};
     
-    % Convert to umol/L
+    % Now, convert to umol/L with decimal in right place; this depends on
+    % the units/format of the values recorded during the deployment
     
-    AutoBOD_data.DO_uM_O2_uncorr = AutoBOD_data.DO_mg_L_uncorr*(1000)*(1/31.998);
-
     % Note that we will correct for salinity later, once we figure out
     % what data segment came from which bottle
-     
+    
+    % ***** This section works ok for data in % sat with ores = 2,
+    % but user should revisit this section after making any changes to OEM
+    % settings such that data input format is different
+    
+    if AutoBOD_deploy_metadata.Presens_oxyu(Ind_ThisDeploy)==0
+        
+        % Code oxyu = 0 indicates oxygen was obtained in % sat
+        
+        % First, put decimal in correct place
+        
+        AutoBOD_data.DO_uncorr_dec_adj = AutoBOD_data.DO_uncorr*...
+            (10^(AutoBOD_deploy_metadata.Presens_ores(Ind_ThisDeploy)-1));
+        
+        % Now, convert from % sat to uM using same Bunsen coefficients etc.
+        % as PreSens
+        
+        AtmP = AutoBOD_deploy_metadata.Baro_press_hPa(Ind_ThisDeploy); % Retrieve atmos. press. in hPa
+        
+        AutoBOD_data.DO_uM_O2_uncorr = ((AtmP-exp(52.57-6690.9./(273.15+AutoBOD_data.Temp_deg_C)-4.681.*log(273.15+AutoBOD_data.Temp_deg_C)))/1013)...
+            .*AutoBOD_data.DO_uncorr_dec_adj./100*0.2095.*...
+            (48.998-1.335.*AutoBOD_data.Temp_deg_C+0.02755.*...
+            power(AutoBOD_data.Temp_deg_C,2)-...
+            0.000322.*power(AutoBOD_data.Temp_deg_C,3)+...
+            0.000001598.*power(AutoBOD_data.Temp_deg_C,4))*32/22.414*31.25;
+        
+    else
+        
+        % Future code to convert data obtained in other formats should go
+        % here
+        
+        AutoBOD_data.DO_uM_O2_uncorr = AutoBOD_data.DO_uncorr;
+        
+    end
+    
     % ****** Error ****** 
     
     AutoBOD_data.Err = AutoBOD_rawdata{5};
@@ -343,7 +452,7 @@ for i=1:length(Deploy_queue)
                 if j<length(AutoBOD_data.DO_uM_O2_uncorr)-Max_RECD
                     Window_hi = j+Max_RECD;
                 else
-                    Window_hi = j+(length(AutoBOD_data.DO_uM_O2_uncorr)-j)
+                    Window_hi = j+(length(AutoBOD_data.DO_uM_O2_uncorr)-j);
                 end
                 
                 if (sum(AutoBOD_data.Err(Window_low:Window_hi))<=Max_RECD && ...
@@ -432,9 +541,7 @@ for i=1:length(Deploy_queue)
             This_segment = This_segment+1;
              
         end
-        
-        j
-        
+            
     end
     
     clear j;
@@ -527,12 +634,12 @@ for i=1:length(Deploy_queue)
             
             % Calculate a salinity compensation factor
             
-            Sal_comp_factors = exp(Sal_this_bottle*(...
+            Sal_comp_factors = exp(Sal_this_bottle.*(...
                 B_0+...
-                B_1*Scaled_temps+...
+                B_1.*Scaled_temps+...
                 B_2.*(Scaled_temps.^2)+...
                 B_3.*(Scaled_temps.^3))+...
-                C_0*(Sal_this_bottle^2));
+                C_0.*(Sal_this_bottle^2));
             
             % Compute salinity-corrected DO concentrations in umol/L
             
@@ -553,28 +660,90 @@ for i=1:length(Deploy_queue)
     
     clear k l;
     
+    %% Plot data for this deployment
+    
+    figure;
+
+    Plot_colors=hsv(Num_bots);
+    Legend_text = num2cell(NaN(Num_bots,1));
+
+    hold on;
+    for n=1:Num_bots
+        plot(AutoBOD_segmeans.Timestamp_local(AutoBOD_segmeans.Bot_ID==n),...
+            AutoBOD_segmeans.DO_uM_O2_mean(AutoBOD_segmeans.Bot_ID==n),...
+            'Color',Plot_colors(n,:),'LineStyle','-','Marker','none');
+        Legend_text{n} = ['Bottle ' num2str(n) ', ' strrep(AutoBOD_bottle_metadata.Sample_ID{find(...
+            (strcmp([AutoBOD_bottle_metadata.Deployment_ID'],Deploy_queue{i}))' &...
+            AutoBOD_bottle_metadata.Bottle_ID==n)},'_','\_')];
+    end
+    
+    title(['AutoBOD data for deployment: ' strrep(Deploy_queue{i},'_','\_')]);
+    xlabel('Time');
+    ylabel('Dissolved oxygen (\mumol/L)');
+    legend(Legend_text);
+
+    hold off;
+    
+    clear n;
+
     %% Calculation of rates of DO change in each bottle, using linear regression
     
     % Requires linfit.m
     
     for m=1:Num_bots
         
-        % Extract needed data for this bottle 
+        % Extract needed data for this bottle
         
-        x = juliandate(AutoBOD_segmeans.Timestamp_local(AutoBOD_segmeans.Bot_ID==m));
-        y = AutoBOD_segmeans.DO_uM_O2_mean(AutoBOD_segmeans.Bot_ID==m);
-        sy = AutoBOD_segmeans.DO_uM_O2_sigma(AutoBOD_segmeans.Bot_ID==m);
+        % Retrieve start and end times to be used for calculation
+        
+        t1 = AutoBOD_deploy_metadata.Calc_starttime_local(Ind_ThisDeploy);
+        t2 = AutoBOD_deploy_metadata.Calc_endtime_local(Ind_ThisDeploy);
+        
+        x = juliandate(AutoBOD_segmeans.Timestamp_local(AutoBOD_segmeans.Bot_ID==m &...
+            AutoBOD_segmeans.Timestamp_local>=t1 &...
+            AutoBOD_segmeans.Timestamp_local<=t2));
+        y = AutoBOD_segmeans.DO_uM_O2_mean(AutoBOD_segmeans.Bot_ID==m &...
+            AutoBOD_segmeans.Timestamp_local>=t1 &...
+            AutoBOD_segmeans.Timestamp_local<=t2);
+        sy = AutoBOD_segmeans.DO_uM_O2_sigma(AutoBOD_segmeans.Bot_ID==m &...
+            AutoBOD_segmeans.Timestamp_local>=t1 &...
+            AutoBOD_segmeans.Timestamp_local<=t2);
         
         [a sa cov r]=linfit(x,y,sy);
         
-        plot(AutoBOD_segmeans.Timestamp_local(AutoBOD_segmeans.Bot_ID==m),AutoBOD_segmeans.DO_uM_O2_mean(AutoBOD_segmeans.Bot_ID==m),'o')
+        % Record rate and error in AutoBOD_rate_results
+        
+        AutoBOD_rate_results.dO2dt_umol_L_d(find(...
+            (strcmp([AutoBOD_bottle_metadata.Deployment_ID'],Deploy_queue{i}))' &...
+            AutoBOD_bottle_metadata.Bottle_ID==m)) = a(2);
+        
+         AutoBOD_rate_results.dO2dt_umol_L_d_sigma(find(...
+            (strcmp([AutoBOD_bottle_metadata.Deployment_ID'],Deploy_queue{i}))' &...
+            AutoBOD_bottle_metadata.Bottle_ID==m)) = sa(2);
+        
+        % Record metadata
+        
+        AutoBOD_rate_results.Deployment_ID(find(...
+            (strcmp([AutoBOD_bottle_metadata.Deployment_ID'],Deploy_queue{i}))' &...
+            AutoBOD_bottle_metadata.Bottle_ID==m)) = cellstr(Deploy_queue{i});
+        
+        AutoBOD_rate_results.Bottle_ID(find(...
+            (strcmp([AutoBOD_bottle_metadata.Deployment_ID'],Deploy_queue{i}))' &...
+            AutoBOD_bottle_metadata.Bottle_ID==m)) = m;
+        
+        AutoBOD_rate_results.Sample_ID(find(...
+            (strcmp([AutoBOD_bottle_metadata.Deployment_ID'],Deploy_queue{i}))' &...
+            AutoBOD_bottle_metadata.Bottle_ID==m)) = cellstr(AutoBOD_bottle_metadata.Sample_ID(find(...
+            (strcmp([AutoBOD_bottle_metadata.Deployment_ID'],Deploy_queue{i}))' &...
+            AutoBOD_bottle_metadata.Bottle_ID==m)));
+        
+        AutoBOD_rate_results.Sample_replicate(find(...
+            (strcmp([AutoBOD_bottle_metadata.Deployment_ID'],Deploy_queue{i}))' &...
+            AutoBOD_bottle_metadata.Bottle_ID==m)) = AutoBOD_bottle_metadata.Sample_replicate(find(...
+            (strcmp([AutoBOD_bottle_metadata.Deployment_ID'],Deploy_queue{i}))' &...
+            AutoBOD_bottle_metadata.Bottle_ID==m));
         
         
-    
-    
-            
+    end
+        
 end
-
-
-
-%%

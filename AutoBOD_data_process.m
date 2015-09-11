@@ -126,13 +126,14 @@ C_0 = -3.11680E-07;
 % Flow fields into cell array AutoBOD_deploy_metadata
 
 % Easy fields first
-AutoBOD_deploy_metadata.Deployment_ID = cellstr(raw_deploy(9:end,1));
-AutoBOD_deploy_metadata.Cruise_ID = cellstr(txt_deploy(9:end,2));
-AutoBOD_deploy_metadata.Incu_temp_deg_C = cell2mat(raw_deploy(9:end,5));
-AutoBOD_deploy_metadata.Datafile_loc = cellstr(raw_deploy(9:end,6));
-AutoBOD_deploy_metadata.Presens_ores = cell2mat(raw_deploy(9:end,8));
-AutoBOD_deploy_metadata.Presens_oxyu = cell2mat(raw_deploy(9:end,7));
-AutoBOD_deploy_metadata.Baro_press_hPa = cell2mat(raw_deploy(9:end,9));
+AutoBOD_deploy_metadata.Deployment_ID = cellstr(raw_deploy(10:end,1));
+AutoBOD_deploy_metadata.Cruise_ID = cellstr(txt_deploy(10:end,2));
+AutoBOD_deploy_metadata.Incu_temp_deg_C = cell2mat(raw_deploy(10:end,5));
+AutoBOD_deploy_metadata.Datafile_loc = cellstr(raw_deploy(10:end,6));
+AutoBOD_deploy_metadata.Presens_ores = cell2mat(raw_deploy(10:end,8));
+AutoBOD_deploy_metadata.Presens_oxyu = cell2mat(raw_deploy(10:end,7));
+AutoBOD_deploy_metadata.Baro_press_hPa = cell2mat(raw_deploy(10:end,9));
+AutoBOD_deploy_metadata.Computerclock_tz = cellstr(raw_deploy(10:end,12));
 AutoBOD_bottle_metadata.Deployment_ID = cellstr(raw_bottle(6:end,1));
 AutoBOD_bottle_metadata.Bottle_ID = cell2mat(raw_bottle(6:end,2));
 AutoBOD_bottle_metadata.Sample_ID = cellstr(raw_bottle(6:end,3));
@@ -149,21 +150,21 @@ NumDeploys = length(AutoBOD_deploy_metadata.Deployment_ID);
 % Now, the fields requiring a bit more manipulation
 
 % Time zone
-AutoBOD_deploy_metadata.Incu_timezone = regexp(raw_deploy(9:end,3),'.{6}$','match');
+AutoBOD_deploy_metadata.Incu_timezone = regexp(raw_deploy(10:end,3),'.{6}$','match');
 AutoBOD_deploy_metadata.Incu_timezone = ...
     reshape([AutoBOD_deploy_metadata.Incu_timezone{:}],NumDeploys,1);
 
 % Incubation start/endtimes
-AutoBOD_deploy_metadata.Incu_starttime_UTC = datetime(raw_deploy(9:end,3),...
+AutoBOD_deploy_metadata.Incu_starttime_UTC = datetime(raw_deploy(10:end,3),...
     'InputFormat','uuuu-MM-dd''T''HH:mm:ssXXX','TimeZone','UTC');
-AutoBOD_deploy_metadata.Incu_endtime_UTC = datetime(raw_deploy(9:end,4),...
+AutoBOD_deploy_metadata.Incu_endtime_UTC = datetime(raw_deploy(10:end,4),...
     'InputFormat','uuuu-MM-dd''T''HH:mm:ssXXX','TimeZone','UTC');
 
 % Start/endtimes to be used for calculation of respiration rates (if given)
 
 for i=1:length(AutoBOD_deploy_metadata.Deployment_ID)
     
-    if strcmp([txt_deploy(8+i,10)],'')
+    if strcmp([txt_deploy(9+i,10)],'')
         
         % No specific calculation timepoints were specified, just use
         % deployment start/end points
@@ -175,9 +176,9 @@ for i=1:length(AutoBOD_deploy_metadata.Deployment_ID)
         
         % The user specified some calculation start/end points
         
-        AutoBOD_deploy_metadata.Calc_starttime_UTC(i) = datetime(raw_deploy(8+i,10),...
+        AutoBOD_deploy_metadata.Calc_starttime_UTC(i) = datetime(raw_deploy(9+i,10),...
             'InputFormat','uuuu-MM-dd''T''HH:mm:ssXXX','TimeZone','UTC');
-        AutoBOD_deploy_metadata.Calc_endtime_UTC(i) = datetime(raw_deploy(8+i,11),...
+        AutoBOD_deploy_metadata.Calc_endtime_UTC(i) = datetime(raw_deploy(9+i,11),...
             'InputFormat','uuuu-MM-dd''T''HH:mm:ssXXX','TimeZone','UTC');
         
     end
@@ -327,12 +328,18 @@ for i=1:length(Deploy_queue)
         
     % ****** Create timestamps ******
     
+    % Have to first account for computer clock, then convert to whatever
+    % timezone the deployment actually occured in
+    
     AutoBOD_data.Timestamp_local = datetime(year(datenum(AutoBOD_rawdata{10})),...
         month(datenum(AutoBOD_rawdata{10})),...
         day(datenum(AutoBOD_rawdata{10})),...
         hour(datenum(AutoBOD_rawdata{11})),...
         minute(datenum(AutoBOD_rawdata{11})),...
         second(datenum(AutoBOD_rawdata{11})),'TimeZone',...
+        AutoBOD_deploy_metadata.Computerclock_tz{Ind_ThisDeploy});
+    
+    AutoBOD_data.Timestamp_local = datetime(AutoBOD_data.Timestamp_local,'TimeZone',...
         AutoBOD_deploy_metadata.Incu_timezone{Ind_ThisDeploy});
 
     % ****** Temperature ****** 
@@ -669,6 +676,9 @@ for i=1:length(Deploy_queue)
 
     hold on;
     for n=1:Num_bots
+        
+        % Plot data
+        
         plot(AutoBOD_segmeans.Timestamp_local(AutoBOD_segmeans.Bot_ID==n),...
             AutoBOD_segmeans.DO_uM_O2_mean(AutoBOD_segmeans.Bot_ID==n),...
             'Color',Plot_colors(n,:),'LineStyle','-','Marker','none');
@@ -676,6 +686,18 @@ for i=1:length(Deploy_queue)
             (strcmp([AutoBOD_bottle_metadata.Deployment_ID'],Deploy_queue{i}))' &...
             AutoBOD_bottle_metadata.Bottle_ID==n)},'_','\_')];
     end
+    
+    % Superimpose lines showing segment used for rate calculation
+    
+    % Retrieve start and end times to be used for calculation in next
+    % section
+    
+    t1 = AutoBOD_deploy_metadata.Calc_starttime_local(Ind_ThisDeploy);
+    t2 = AutoBOD_deploy_metadata.Calc_endtime_local(Ind_ThisDeploy);
+    tz = AutoBOD_deploy_metadata.Incu_timezone{Ind_ThisDeploy};
+        
+    plot([datetime(t1,'TimeZone',tz) datetime(t1,'TimeZone',tz)],ylim,'k--')
+    plot([datetime(t2,'TimeZone',tz) datetime(t2,'TimeZone',tz)],ylim,'k--')
     
     title(['AutoBOD data for deployment: ' strrep(Deploy_queue{i},'_','\_')]);
     xlabel('Time');
@@ -747,3 +769,39 @@ for i=1:length(Deploy_queue)
     end
         
 end
+
+%% Finally, can group replicate bottle data by treatment & calculate overall rates
+
+% Preallocate elements of destination structure 
+
+% Get unique deployment-treatment combinations that exist in the metadata
+% log
+
+TreatsTable = table(AutoBOD_rate_results.Deployment_ID,AutoBOD_rate_results.Sample_ID);
+UniqueTreats = unique(TreatsTable);
+
+NumCombs = height(UniqueTreats);
+
+AutoBOD_treat_results.Deployment_ID = UniqueTreats{:,1};
+AutoBOD_treat_results.Sample_ID = UniqueTreats{:,2};
+AutoBOD_treat_results.NumReps = NaN(NumCombs,1);
+AutoBOD_treat_results.dO2dt_umol_L_d = NaN(NumCombs,1);
+AutoBOD_treat_results.dO2dt_umol_L_d_sigma = NaN(NumCombs,1);
+
+for i=1:NumCombs
+    
+    AutoBOD_treat_results.NumReps(i) = ...
+        length(TreatsTable{strcmp(TreatsTable{:,1},UniqueTreats{i,1}) &...
+        strcmp(TreatsTable{:,2},UniqueTreats{i,2}),:});
+    
+    AutoBOD_treat_results.dO2dt_umol_L_d(i) = ...
+        mean(AutoBOD_rate_results.dO2dt_umol_L_d(strcmp(AutoBOD_rate_results.Deployment_ID,AutoBOD_treat_results.Deployment_ID(i)) &...
+        strcmp(AutoBOD_rate_results.Sample_ID,AutoBOD_treat_results.Sample_ID(i))));
+    
+    AutoBOD_treat_results.dO2dt_umol_L_d_sigma(i) = sqrt(sum(AutoBOD_rate_results.dO2dt_umol_L_d_sigma(strcmp(AutoBOD_rate_results.Deployment_ID,AutoBOD_treat_results.Deployment_ID(i)) &...
+        strcmp(AutoBOD_rate_results.Sample_ID,AutoBOD_treat_results.Sample_ID(i)))))/AutoBOD_treat_results.NumReps(i);
+    
+end
+    
+    
+    

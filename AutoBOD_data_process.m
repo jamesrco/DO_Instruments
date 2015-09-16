@@ -131,6 +131,17 @@ B_2 = -6.90358E-03;
 B_3 = -4.29155E-03;
 C_0 = -3.11680E-07;
 
+% Specify constants used in calibration of the PreSens OEM fiber optic
+% module; only really necessary if user elects to have oxygen values
+% calculated from raw phase and amplitude data. These values can be
+% obtained from the box using the "repo" command.
+
+OEM_cal0_phase = 66.14;
+OEM_cal100_phase = 34.56;
+OEM_T0_degC = 20.0;
+OEM_T100_degC = 20.0;
+OEM_cal_press_mbar = 981;
+
 %% Read in & process metadata from log file
 
 % Read in metadata
@@ -361,7 +372,7 @@ for i=1:length(Deploy_queue)
     AutoBOD_data.Temp_deg_C = AutoBOD_rawdata{3};
     
     % ****** DO ******
-    
+       
     % Read in raw, salinity uncorrected value
     
     AutoBOD_data.DO_uncorr = AutoBOD_rawdata{4};
@@ -376,46 +387,131 @@ for i=1:length(Deploy_queue)
     % but user should revisit this section after making any changes to OEM
     % settings such that data input format is different
     
-    if AutoBOD_deploy_metadata.Presens_oxyu(Ind_ThisDeploy)==0
+    % First, give user option to override scripting below based on the ores
+    % setting and calculate DO directly from raw phase and amplitude
+    
+    disp(['Do you want to override onboard-calculated DO data for deployment '...
+        char(10) AutoBOD_deploy_metadata.Deployment_ID{Ind_ThisDeploy} ...
+        ' and calculate DO concentration directly from raw' char(10) 'phase and amplitude data?'...
+        char(10) char(10) 'Provide input as Y/N. Lack of input will default to N.'])
+    DO_override = input('','s');
+    if isempty(DO_override)
+        DO_override = 'N';
+    end
+    
+    if DO_override == 'Y'
         
-        % Code oxyu = 0 indicates oxygen was obtained in % sat
+        % *********************** Under development
+        % As of 9/16/15, doesn't look like this is working correctly
+     
+        % User wants to calculate concentrations directly from phase and
+        % amplitude data
         
-        % First, put decimal in correct place
+        % Load in necessary (additional) data
         
-        AutoBOD_data.DO_uncorr_dec_adj = AutoBOD_data.DO_uncorr*...
-            (10^(AutoBOD_deploy_metadata.Presens_ores(Ind_ThisDeploy)-1));
+        % ****** Phase & amplitude ****** 
         
-        % Now, convert from % sat to uM using same Bunsen coefficients etc.
-        % as PreSens
+        AutoBOD_data.Phase = AutoBOD_rawdata{2};
         
-        AtmP = AutoBOD_deploy_metadata.Baro_press_hPa(Ind_ThisDeploy); % Retrieve atmos. press. in hPa
-        
-        AutoBOD_data.DO_uM_O2_uncorr = ((AtmP-exp(52.57-6690.9./(273.15+AutoBOD_data.Temp_deg_C)-4.681.*log(273.15+AutoBOD_data.Temp_deg_C)))/1013)...
-            .*AutoBOD_data.DO_uncorr_dec_adj./100*0.2095.*...
-            (48.998-1.335.*AutoBOD_data.Temp_deg_C+0.02755.*...
-            power(AutoBOD_data.Temp_deg_C,2)-...
-            0.000322.*power(AutoBOD_data.Temp_deg_C,3)+...
-            0.000001598.*power(AutoBOD_data.Temp_deg_C,4))*32/22.414*31.25;
-        
-    elseif AutoBOD_deploy_metadata.Presens_oxyu(Ind_ThisDeploy)==5
+        % Put decimal in correct place
             
-        % Code oxyu = 5 indicates oxygen was obtained in micromoles/L
+            AutoBOD_data.Phase = AutoBOD_data.Phase*...
+                (10^-(AutoBOD_deploy_metadata.Presens_ores(Ind_ThisDeploy)));
+
         
-        % First, put decimal in correct place
+        AutoBOD_data.Amp = AutoBOD_rawdata{1};
         
-        AutoBOD_data.DO_uncorr_dec_adj = AutoBOD_data.DO_uncorr*...
-            (10^(AutoBOD_deploy_metadata.Presens_ores(Ind_ThisDeploy)-1));
+        % Make calculation based on formulae in PreSens spreadsheet
+        % "110318_ChHu_Re-calculated Sheet for PSt3 type sensors_EOM_v1.xlsx"
         
-        % Shouldn't require any conversion, so take data as it is now
+        % Some parameters, first
         
-         AutoBOD_data.DO_uM_O2_uncorr = AutoBOD_data.DO_uncorr_dec_adj;      
+        PSt3_f_1 = 0.833;
+        del_phaseK = -0.0847;
+        del_K_svK = 0.000416;
+        PSt3_m = 34;
+        tan_phase0_T100 = tan(((OEM_cal0_phase+del_phaseK*(OEM_T100_degC-OEM_T0_degC)))*pi/180);
+        tan_phase0_Tm = tan((OEM_cal0_phase+(del_phaseK*(AutoBOD_data.Temp_deg_C-OEM_T0_degC)))*pi/180);
+        tan_phase100_T100 = tan(OEM_cal100_phase*pi/180);
+        tan_phasem_Tm = tan(AutoBOD_data.Phase*pi/180);
+        PSt3_A = tan_phase100_T100/tan_phase0_T100*1/PSt3_m*power(100,2);
+        PSt3_B = tan_phase100_T100/tan_phase0_T100*100+tan_phase100_T100/tan_phase0_T100*1/PSt3_m*100-...
+            PSt3_f_1*1/PSt3_m*100-100+PSt3_f_1*100;
+        PSt3_C = tan_phase100_T100/tan_phase0_T100-1;
+        K_sv_T100 = (-PSt3_B+(sqrt(power(PSt3_B,2)-4*PSt3_A*PSt3_C)))/(2*PSt3_A);
+        K_sv_Tm = K_sv_T100+(del_K_svK*(AutoBOD_data.Temp_deg_C-OEM_T100_degC));
+        PSt3_a = tan_phasem_Tm./tan_phase0_Tm*1/PSt3_m.*power(K_sv_Tm,2);
+        PSt3_b = tan_phasem_Tm./tan_phase0_Tm.*K_sv_Tm+tan_phasem_Tm./tan_phase0_Tm*1./PSt3_m.*K_sv_Tm-...
+            PSt3_f_1*1/PSt3_m.*K_sv_Tm-K_sv_Tm+PSt3_f_1.*K_sv_Tm;
+        PSt3_c = tan_phasem_Tm./tan_phase0_Tm-1;
         
-    else
+        % First calculate % air sat
         
-        % Future code to convert data obtained in other formats should go
-        % here
+        DO_rawdata_airsat = (-((tan(AutoBOD_data.Phase*pi/180))./(tan((OEM_cal0_phase+(del_phaseK.*(AutoBOD_data.Temp_deg_C-OEM_T0_degC)))*pi/180)).*...
+            (K_sv_T100+(del_K_svK.*(AutoBOD_data.Temp_deg_C-OEM_T100_degC)))+(tan(AutoBOD_data.Phase*pi/180))./(tan((OEM_cal0_phase+...
+            (del_phaseK.*(AutoBOD_data.Temp_deg_C-OEM_T0_degC)))*pi/180))*1/PSt3_m.*(K_sv_T100+(del_K_svK.*(AutoBOD_data.Temp_deg_C-OEM_T100_degC)))...
+            -PSt3_f_1*1/PSt3_m.*(K_sv_T100+(del_K_svK.*(AutoBOD_data.Temp_deg_C-OEM_T100_degC)))-(K_sv_T100+(del_K_svK.*(AutoBOD_data.Temp_deg_C-OEM_T100_degC)))...
+            +PSt3_f_1.*(K_sv_T100+(del_K_svK.*(AutoBOD_data.Temp_deg_C-OEM_T100_degC))))+(sqrt((power(((tan(AutoBOD_data.Phase*pi/180))...
+            ./(tan((OEM_cal0_phase+(del_phaseK.*(AutoBOD_data.Temp_deg_C-OEM_T0_degC)))*pi/180)).*(K_sv_T100+(del_K_svK.*(AutoBOD_data.Temp_deg_C-OEM_T100_degC)))...
+            +(tan(AutoBOD_data.Phase*pi/180))./(tan((OEM_cal0_phase+(del_phaseK.*(AutoBOD_data.Temp_deg_C-OEM_T0_degC)))*pi/180))*...
+            1/PSt3_m.*(K_sv_T100+(del_K_svK.*(AutoBOD_data.Temp_deg_C-OEM_T100_degC)))-PSt3_f_1*1/PSt3_m.*(K_sv_T100+(del_K_svK.*...
+            (AutoBOD_data.Temp_deg_C-OEM_T100_degC)))-(K_sv_T100+(del_K_svK.*(AutoBOD_data.Temp_deg_C-OEM_T100_degC)))+PSt3_f_1.*(K_sv_T100+(del_K_svK.*(AutoBOD_data.Temp_deg_C-OEM_T100_degC)))),2))...
+            -4.*((tan(AutoBOD_data.Phase*pi/180))./(tan((OEM_cal0_phase+(del_phaseK.*(AutoBOD_data.Temp_deg_C-OEM_T0_degC)))*pi/180))...
+            *1/PSt3_m.*power((K_sv_T100+(del_K_svK.*(AutoBOD_data.Temp_deg_C-OEM_T100_degC))),2)).*((tan(AutoBOD_data.Phase*pi/180))...
+            ./(tan((OEM_cal0_phase+(del_phaseK.*(AutoBOD_data.Temp_deg_C-OEM_T0_degC)))*pi/180))-1))))./(2*((tan(AutoBOD_data.Phase*pi/180))...
+            ./(tan((OEM_cal0_phase+(del_phaseK.*(AutoBOD_data.Temp_deg_C-OEM_T0_degC)))*pi/180))*1/PSt3_m.*power((K_sv_T100+(del_K_svK.*(AutoBOD_data.Temp_deg_C-OEM_T100_degC))),2)));
         
-        AutoBOD_data.DO_uM_O2_uncorr = AutoBOD_data.DO_uncorr;
+        % Now, convert to micromoles per L
+        
+        AutoBOD_data.DO_uM_O2_uncorr = ((OEM_cal_press_mbar-exp(52.57-6690.9./...
+            (273.15+AutoBOD_data.Temp_deg_C)-4.681.*log(273.15+AutoBOD_data.Temp_deg_C)))...
+            /1013).*DO_rawdata_airsat./100*0.2095.*(48.998-1.335.*AutoBOD_data.Temp_deg_C+0.02755.*power(AutoBOD_data.Temp_deg_C,2)...
+            -0.000322.*power(AutoBOD_data.Temp_deg_C,3)+0.000001598.*power(AutoBOD_data.Temp_deg_C,4))*32/22.414*31.25;
+        
+    elseif DO_override == 'N'
+        
+        if AutoBOD_deploy_metadata.Presens_oxyu(Ind_ThisDeploy)==0
+            
+            % Code oxyu = 0 indicates oxygen was obtained in % sat
+            
+            % First, put decimal in correct place
+            
+            AutoBOD_data.DO_uncorr_dec_adj = AutoBOD_data.DO_uncorr*...
+                (10^(AutoBOD_deploy_metadata.Presens_ores(Ind_ThisDeploy)-1));
+            
+            % Now, convert from % sat to uM using same Bunsen coefficients etc.
+            % as PreSens
+            
+            AtmP = AutoBOD_deploy_metadata.Baro_press_hPa(Ind_ThisDeploy); % Retrieve atmos. press. in hPa
+            
+            AutoBOD_data.DO_uM_O2_uncorr = ((AtmP-exp(52.57-6690.9./(273.15+AutoBOD_data.Temp_deg_C)-4.681.*log(273.15+AutoBOD_data.Temp_deg_C)))/1013)...
+                .*AutoBOD_data.DO_uncorr_dec_adj./100*0.2095.*...
+                (48.998-1.335.*AutoBOD_data.Temp_deg_C+0.02755.*...
+                power(AutoBOD_data.Temp_deg_C,2)-...
+                0.000322.*power(AutoBOD_data.Temp_deg_C,3)+...
+                0.000001598.*power(AutoBOD_data.Temp_deg_C,4))*32/22.414*31.25;
+            
+        elseif AutoBOD_deploy_metadata.Presens_oxyu(Ind_ThisDeploy)==5
+            
+            % Code oxyu = 5 indicates oxygen was obtained in micromoles/L
+            
+            % First, put decimal in correct place
+            
+            AutoBOD_data.DO_uncorr_dec_adj = AutoBOD_data.DO_uncorr*...
+                (10^(AutoBOD_deploy_metadata.Presens_ores(Ind_ThisDeploy)-1));
+            
+            % Shouldn't require any conversion, so take data as it is now
+            
+            AutoBOD_data.DO_uM_O2_uncorr = AutoBOD_data.DO_uncorr_dec_adj;
+            
+        else
+            
+            % Future code to convert data obtained in other formats should go
+            % here
+            
+            AutoBOD_data.DO_uM_O2_uncorr = AutoBOD_data.DO_uncorr;
+            
+        end
         
     end
     

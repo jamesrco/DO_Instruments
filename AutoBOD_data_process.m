@@ -1,6 +1,6 @@
 % AutoBOD_data_process.m
 %
-% Created 19 Aug 2015 by JRC under MATLAB R2015a
+% Created 19 Aug 2015 by JRC under MATLAB R2015a; version history on GitHub
 % Owner/author: James Collins, MIT-WHOI Joint Program, Woods Hole
 % Oceanographic Institution, james.r.collins@aya.yale.edu
 %
@@ -78,6 +78,20 @@
 % than the local time at the site; instead, the start/end times given in
 % the log are used to calculate the length of the period of data from which
 % results are calculated (where the first entry in the data file is t = 0)
+%
+% 4. The script includes several code snippets (user must select),
+% depending on the format of the source DO data. Several scenarios exist:
+%    
+%   1. Onboard calculations were made as micromoles/L (OEM unit setting
+%      (oxyu0005), so DO values can be imported directly
+%   2. Onboard calculations were made as % air sat (oxyu0000, the default),
+%      so conversion using concurrent temp and pressure measurements is
+%      necessary
+%   3. User desires calculation of values in micromoles/L directly from the
+%      raw phase and amplitude measurements in the data file
+%
+% Note that in any of the above scenarios, values will still have to be
+% adjusted for salinity (accomplished by a later section of code)
 
 %% Clean things up and prep workspace
 
@@ -382,6 +396,19 @@ for i=1:length(Deploy_queue)
             power(AutoBOD_data.Temp_deg_C,2)-...
             0.000322.*power(AutoBOD_data.Temp_deg_C,3)+...
             0.000001598.*power(AutoBOD_data.Temp_deg_C,4))*32/22.414*31.25;
+        
+    elseif AutoBOD_deploy_metadata.Presens_oxyu(Ind_ThisDeploy)==5
+            
+        % Code oxyu = 5 indicates oxygen was obtained in micromoles/L
+        
+        % First, put decimal in correct place
+        
+        AutoBOD_data.DO_uncorr_dec_adj = AutoBOD_data.DO_uncorr*...
+            (10^(AutoBOD_deploy_metadata.Presens_ores(Ind_ThisDeploy)-1));
+        
+        % Shouldn't require any conversion, so take data as it is now
+        
+         AutoBOD_data.DO_uM_O2_uncorr = AutoBOD_data.DO_uncorr_dec_adj;      
         
     else
         

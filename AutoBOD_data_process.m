@@ -131,13 +131,15 @@ B_2 = -6.90358E-03;
 B_3 = -4.29155E-03;
 C_0 = -3.11680E-07;
 
-% Specify constants used in calibration of the PreSens OEM fiber optic
+% Specify PSt3 constants used in calibration of the PreSens OEM fiber optic
 % module; only really necessary if user elects to have oxygen values
-% calculated from raw phase and amplitude data. These values can be
-% obtained from the box using the "repo" command.
+% calculated from raw phase and amplitude data. For current version of
+% AutoBOD (9/18/15), be sure to use PSt3 constants from the correct
+% calibration certificate, and NOT the PSt6 constants which are reported
+% from the instrument using the "repo" command
 
-OEM_cal0_phase = 66.14;
-OEM_cal100_phase = 34.56;
+OEM_cal0_phase = 60.21;
+OEM_cal100_phase = 27.42;
 OEM_T0_degC = 20.0;
 OEM_T100_degC = 20.0;
 OEM_cal_press_mbar = 981;
@@ -400,10 +402,7 @@ for i=1:length(Deploy_queue)
     end
     
     if DO_override == 'Y'
-        
-        % *********************** Under development
-        % As of 9/16/15, doesn't look like this is working correctly
-     
+             
         % User wants to calculate concentrations directly from phase and
         % amplitude data
         
@@ -558,7 +557,7 @@ for i=1:length(Deploy_queue)
     
     for j=1:length(AutoBOD_data.DO_uM_O2_uncorr)
         
-        if AutoBOD_data.DO_uM_O2_uncorr(j) > 800
+        if (AutoBOD_data.DO_uM_O2_uncorr(j) > 800 || AutoBOD_data.DO_uM_O2_uncorr(j) < 0)
             
             % As a first check, make sure we don't have a biologically
             % implausible value (the instrument spits out 999.999 as a

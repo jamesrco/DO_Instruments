@@ -3,6 +3,7 @@
 
 # .history files
 *.history
+*.Rhistory
 
 # MATLAB temp files
 *.m~

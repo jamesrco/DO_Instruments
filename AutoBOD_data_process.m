@@ -109,7 +109,7 @@ AutoBOD_LogFile = '/Users/jrcollins/Dropbox/Cruises & projects/PHORCYS & AutoBOD
 % Deployment_metadata field "Deployment_ID"; if left unspecified, script
 % will run through all deployments in the log file
 
-%Desired_Deployments = ['Iselin_PHORCYS_2015_2'];
+Desired_Deployments = ['KOK1507_MC_1';'KOK1507_MC_2';'KOK1507_MC_3';'KOK1507_MC_4'];
 
 Max_RECD = 15; % The maximum allowable read error code deviations
               % this is the maximum number of bad reads allowable in a
@@ -794,7 +794,12 @@ for i=1:length(Deploy_queue)
     
     %% Plot data for this deployment
     
-    figure;
+    % Set up for good printing
+    
+    fh = figure(1);
+    set( fh, ...
+        'PaperSize', [12 4.5], ...
+        'PaperPosition', [0.01 0.01 12 4.5] ) ;
 
     Plot_colors=hsv(Num_bots);
     Legend_text = num2cell(NaN(Num_bots,1));
@@ -811,25 +816,34 @@ for i=1:length(Deploy_queue)
             (strcmp([AutoBOD_bottle_metadata.Deployment_ID'],Deploy_queue{i}))' &...
             AutoBOD_bottle_metadata.Bottle_ID==n)},'_','\_')];
     end
-    
-    % Superimpose lines showing segment used for rate calculation
-    
+        
     % Retrieve start and end times to be used for calculation in next
     % section
     
     t1 = AutoBOD_deploy_metadata.Calc_starttime_local(Ind_ThisDeploy);
     t2 = AutoBOD_deploy_metadata.Calc_endtime_local(Ind_ThisDeploy);
     tz = AutoBOD_deploy_metadata.Incu_timezone{Ind_ThisDeploy};
-        
-    plot([datetime(t1,'TimeZone',tz) datetime(t1,'TimeZone',tz)],ylim,'k--')
-    plot([datetime(t2,'TimeZone',tz) datetime(t2,'TimeZone',tz)],ylim,'k--')
+    
+%     % Superimpose lines showing segment used for rate calculation, if
+%     % desired
+%         
+%     plot([datetime(t1,'TimeZone',tz) datetime(t1,'TimeZone',tz)],ylim,'k--')
+%     plot([datetime(t2,'TimeZone',tz) datetime(t2,'TimeZone',tz)],ylim,'k--')
     
     title(['AutoBOD data for deployment: ' strrep(Deploy_queue{i},'_','\_')]);
     xlabel('Time');
     ylabel('Dissolved oxygen (\mumol/L)');
+    set(gca,'xlim',[datenum(datetime(t1,'TimeZone',tz)) datenum(datetime(t2,'TimeZone',tz))],...
+        'FontSize',14);
     legend(Legend_text);
 
     hold off;
+        
+    % Save plot to file, if desired
+        
+    print(fh,'-dpdf',['AutoBOD_DO_vs_t_' Deploy_queue{i} '.pdf']) ;
+    
+    %print('-dpng',['AutoBOD_DO_vs_t_' Deploy_queue{i} '.eps'])
     
     clear n;
 
@@ -902,8 +916,18 @@ end
 % Get unique deployment-treatment combinations that exist in the metadata
 % log
 
-TreatsTable = table(AutoBOD_rate_results.Deployment_ID,AutoBOD_rate_results.Sample_ID);
-UniqueTreats = unique(TreatsTable);
+% Must remove NaNs since unique doesn't play well with NaNs; this is
+% actually more complicated that it should be, given the format in which we
+% have the data
+
+% Figure out which cells have NaNs in them (if any), and index
+Deploy_IDs=AutoBOD_rate_results.Deployment_ID;
+ind_NaN = cellfun(@(x) all(isnan(x)),Deploy_IDs);
+
+TreatsTable = table(AutoBOD_rate_results.Deployment_ID(~ind_NaN,:),...
+    AutoBOD_rate_results.Sample_ID(~ind_NaN,:)); % Create table
+
+UniqueTreats = unique(TreatsTable(:,:));
 
 NumCombs = height(UniqueTreats);
 

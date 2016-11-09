@@ -1,0 +1,727 @@
+R/V Knorr Calliope metadata file
+Thu 26/Apr/2012 12:37:16
+Current time zone: GMT Standard Time
+==================================================
+
+This line has come from the file Calliope\MetaData\MetaDataInit.txt.
+The file's purpose is to provide a means for adding information to the begining of the Calliope generated MetaData file.
+==================================================
+
+IMET Shortwave Radiation (IMET_SWR)
+Format: xxxx.x   (watts/square meter)
+
+The Eppley Laboratory, Inc. precision pyranometer has a wavelength range of 0.3 to 3 um. Sensor is mounted on the bow mast at a height of 15.5 m above the waterline.
+__________________________________________________
+
+Air temperature  (AT)
+__________________________________________________
+
+Air temp; Port WXT520  (WXTP_Ta)
+Format:  XXX.XX degrees C
+Data obtained from Vaisala WXT520 sensor mounted on the forward mast, port side, 15.5m above the waterline.
+__________________________________________________
+
+Air temperature; WXT520  (WXTS_Ta)
+Format:  XXX.XX degrees C
+Data obtained from Vaisala WXT520 sensor mounted on the forward mast, stbd side, 15.5m above the waterline.
+__________________________________________________
+
+Barometric pressure  (BPR)
+Primary  barometric sensor reading (IMET_BPR)
+BPR data has been corrected for 15.5 meter mast height ( .1185 millibars/m)
+__________________________________________________
+
+Barometric pressure; Port WXT520  (WXTP_Pa)
+Port VaisalaWXT520  barometric sensor reading
+WXTP_Pa data has been corrected for 15.5 meter mast height ( .1185 millibars/m)
+__________________________________________________
+
+Barometric Pressure; Stbd WXT520  (WXTS_Pa)
+Starboard VaisalaWXT520  barometric sensor reading 
+WXTS_Pa data has been corrected for 15.5 meter mast height ( .1185 millibars/m)
+__________________________________________________
+
+Decimal Latitude  (Dec_Lat)
+Format:  +/-xx.xxxx  (S = "-")
+
+Latitude value in degrees obtained from the GPS NMEA $GPRMC data sentence.
+The RMC sentence is obtained from the switched GPS receiver (C-Nav, MX512, GP-90D).
+__________________________________________________
+
+Decimal Longitude  (Dec_Lon)
+Format:  +/-xxx.xxxx  (W = "-")
+
+Longitude value in degrees obtained from the GPS NMEA $GPRMC data sentence.
+The RMC sentence is obtained from the switched GPS receiver (C-Nav, MX512, GP-90D).
+__________________________________________________
+
+Depth (12 kHz)  ( Depth12)
+
+12 kHz depth (meters) from sea surface obtained by Knudsen bathymetry system.
+See Knudsen Bathymetry information for sound speed and transducer depth corrections; normally based on 1500 m/s sound speed & corrected for 5.95 meter (19.5 ft) transducer depth.
+__________________________________________________
+
+Depth (3.5 kHz)  ( Depth35)
+
+3.5 kHz depth (meters) to sea surface obtained from Knudsen bathymetry system.
+See Knudsen Bathymetry information for sound speed and transducer depth corrections; normally based on 1500 m/s sound speed & corrected for 5.95 meter (19.5 ft) transducer depth.
+__________________________________________________
+
+Fluorometer  (FLR)
+__________________________________________________
+
+Furuno Speed  (SPD)
+
+Ship speed through the water in knots from the Furuno Speedlog
+__________________________________________________
+
+GPS GPRMC  (GPRMC)
+NMEA GPRMC data output from the switched GPS receiver (C-Nav, MX512, GP-90D).
+
+$GPRMC data sentence: Header,hhmmss.ss,S, Lat,N/S,Lon,E/W, x.x,y.y, ddmmyy,m.m,E/W*hh<cr><lf>
+   Time = UTC of position fix
+   S = Status ("A" = valid, "V" = receiver warning)
+   Lat & Lon
+   x.x = speed over ground (knots)
+   y.y = Course over ground (degrees true)
+   ddmmyy = date
+   m.m,E/W = magnetic variation, degrees
+   ("E" subtracts from true, "W" adds to true)
+   hh = checksum
+__________________________________________________
+
+Simrad MX512 GPS GPRMB (GPRMB_MX512)
+NMEA GPRMB data string.
+
+Format: $GPRMB,DA,x.x,L/R,OID,DID,Lat,N/S,Lon,E/W,r.r,b.b,v.v,AS*hh<cr><lf>
+  DA = Data Status ("A" = valid, "V" = receiver warning)
+  x.x = Cross trtack error (nautical miles)
+  L/R = Direct to steer (left/right)
+  OID = Origin waypoint ID
+  DID = Destination waypoint ID
+  Lat,N/S = Destination Latitude
+  Lon,E/W = Destination Longitude
+  r.r = Range to destination (nautical miles)
+  b.b = Bearing to destination (degrees true)
+  v.v = Destination closing veliocity (knots)
+  AS = Arrival status (A=Arrival circle entered, V=not entered)
+  hh = checksum
+
+This string allows calculation of time and distance to next waypoint.
+__________________________________________________
+
+Simrad MX512 GPS receiver GPRMC NMEA output  (GPRMC_MX512)
+
+Format:
+ $--RMC,hhmmss.ss,S,lat,a,lon,a,x.x,y.y,ddmmyy,m.m,d*hh<cr><lf>
+  Time = UTC of position fix
+  S = Status ("A" = valid, "V" =  receiver warning)
+  Lat & Lon
+  x.x = speed over ground (knots)
+  y.y = Course over ground (degrees true)
+  ddmmyy = date
+  m.m,d = magnetic variation, degrees ("E" subtracts from true, "W" adds to true)
+__________________________________________________
+
+GPS Navigation data (GPS)
+Complete NMEA data output from the switched GPS receiver (C-Nav, MX512, GP-90D).
+
+$GPGGA data sentence:  Header, UTC of position, Latitude, N/S, Longitude, E/W, Quality indicator, Number of satellites in use, Horizontal dilution, Altitude, M (meters), Geoidal seperation, M (meters), Age of differential data (secs), Differential reference station I.D. * checksum<cr><lf>.
+The single digit following the position information (quality indicator) indicates the type of position fix:
+  0=No valid fix; 1=Standard; 2=Differential; 3=P-Code.
+
+$GPRMC data sentence: Header,hhmmss.ss,S, Lat,N/S,Lon,E/W, x.x,y.y, ddmmyy,m.m,E/W*hh<cr><lf>
+   Time = UTC of position fix
+   S = Status ("A" = valid, "V" = receiver warning)
+   Lat & Lon
+   x.x = speed over ground (knots)
+   y.y = Course over ground (degrees true)
+   ddmmyy = date
+   m.m,E/W = magnetic variation, degrees
+   ("E" subtracts from true, "W" adds to true)
+   hh = checksum
+
+$GPVTG data sentence:  Header, Course, T (degrees true), Course, M (magnetic), 
+  Speed, N (knots), Speed, K (km/hr) * checksum.
+__________________________________________________
+
+GPS course over ground (GPS_COG)
+Format:  XXX.X degrees
+
+This is the primary COG data.
+Course-over-ground (true) in degrees obtained from the GPS GPRMC data sentence.
+The RMC sentence is obtained from the switched GPS receiver (C-Nav, MX512, GP-90D).
+__________________________________________________
+
+GPS speed over ground (GPS_SOG)
+Format:  XX.X  knots
+
+This is the primary SOG data.
+Speed-over-ground (knots) obtained from GPS NMEA $GPRMC data sentence.
+The RMC sentence is obtained from the switched GPS receiver (C-Nav, MX512, GP-90D).
+__________________________________________________
+
+Gill Acoustic Wind Sensor  ( Wnd_Gill)
+
+Gill WindObserver II Ultrasonic Anemometer
+Format:  <stx>id,U axis,V axis,units,sos,temp,status,<etx.>cs
+  stx = \002, etx = \003, cs = check sum  (these items may be deleted)
+  id = sensor identification
+  U & V axis wind speed (meters/sec)
+  units = M (meters)
+  sos = speed of sound (m/sec)
+  temp = air temperature (C)
+  status: 0 =  OK & 60= heater enabled & OK
+         (any other value indicates a possible problem)
+__________________________________________________
+
+IMET Air Temperature (Air_Temp)
+Format: xxx.xx  degrees C
+
+Data is obtained from IMET_HRH humidity sensor.
+__________________________________________________
+
+IMET Barometric Pressure (IMET_BPR)
+Format:  xxxx.xx (milli-bars)
+
+Data is not corrected for sensor altitude; sensor is mounted on the forward mast, 15.5m above the waterline.
+__________________________________________________
+
+IMET Precipitation (IMET_PRC)
+Format:  Last minute (mm/min)  Last hour (mm/hr)  Present level (mm)
+IMET precipitation sensor is mounted on the bow mast at a height of 15.5m above the waterline.
+__________________________________________________
+
+IMET Humidity (IMET_HRH)
+Format:  XX.XX (%RH), XXX.XXX (C)
+IMET temperature and humidity sensor.
+Humidity (HRH) and air temperature (Air_Temp) are obtained from this instrument. Sensor is mounted on the forward mast, 15.5m above the waterline.
+__________________________________________________
+
+IMET Wind (IMET_WND)
+Format: X, Y, Total, Max, Min, LastVane, LastCompass, C1, C2
+
+	Wind X (m/sec), Positive for a stbd to port wind
+	Wind Y (m/sec), Positive for a bow to stern wind
+	Wind Total (m/sec), Averaged over previous minute
+	Wind Max (m/sec, 15 sec interval),
+	Wind Min (m/sec, 15 sec interval),
+	Last Vane Reading (deg),
+	Last Compass Reading (deg),
+	Counter1 ("0"), Counter2 ("4")
+
+Note - Wind direction is no longer provided as a single quantity.  Direction values are ship relative. The wind sensor does not have a compass installed (LastCompass should always be 0.0). Sensor is installed on the forward mast, 15.5m above the waterline.
+
+	  WHOI ship installation convention:
+	  "Wind Y" is positive for a stbd to port wind.
+	  "Wind X" is positive for a bow to stern wind.
+__________________________________________________
+
+Knudsen bathymetry  ( Knudsen)
+
+Depth to surface (meters).
+Format:
+   $PKEL99,HF,xx.xx,cc.cc,LF,yy.yy,cc.cc,ssss,lat,lon
+	"HF"   High freq header 
+	xx.xx  12 kHz depth to surface using cc.cc & ssss corrections (meters)
+	cc.cc  depth of 12 kHz transducer (meters)
+	"LF"    Low freq header
+	yy.yy  3.5 kHz depth to surface using cc.cc & ssss corrections (meters)
+	cc.cc  depth of 3.5 kHz transducer (meters)
+	ssss    sound speed used for depth calculations (m/s) 
+	Lat     Latitude
+	Lon    Longitude
+
+Note - 12 kHz and 3.5 kHz transducers are 5 meters below the surface.
+__________________________________________________
+
+Latitude (GPS_Lat)
+GPS Latitude formatted for display.
+  Format:  ddø mm.mmmm, N/S
+
+Latitude value is obtained from the GPS NMEA $GPRMC data sentence.
+The RMC sentence is obtained from the switched GPS receiver (C-Nav, MX512, GP-90D).
+__________________________________________________
+
+Longitude (GPS_Lon)
+GPS Longitude formatted for display.
+  Format:  dddø mm.mmmm, E/W
+
+Longitude value is obtained from the GPS NMEA $GPRMC data sentence.
+The RMC sentence is obtained from the switched GPS receiver (C-Nav, MX512, GP-90D).
+__________________________________________________
+
+Magnetometer  (PIOSM_010)
+IXSEA
+__________________________________________________
+
+NMEA ship heading (HEHDT)
+NMEA format:  Header ($HEHDT), Heading (degrees), T (true), Heading (degrees), M (magnetic) * checksum.
+
+Ship's heading obtained from switched data source (Gyro#1, Gyro#2, Phins).
+
+Version 2.20 (1/1/97) of the NMEA 0183 standard does not show magnetic heading in this data sentence and the validity of this item is questionable.
+__________________________________________________
+
+Phins attitude NMEA   ( PHTRH)
+Format:  $PHTRH,x.xx,a,y.yy,b,z.zz,c*hh<cr><lf>
+	x.xx = pitch (degrees)
+	a = "M" for bow up, "P" for bow down
+	y.yy = roll (degrees)
+	b = "B" for port down, "T" for port up
+	z.zz = heave (meters)
+	c = "U" for Phins going Up, "O" for going down
+	hh = checksum
+__________________________________________________
+
+Phins heading  ( PhinsHd)
+Format:  xxx.xx degrees true
+__________________________________________________
+
+Phins heading NMEA  ( HEHDT_005)
+Format: $HEHDT,x.xxx,T*hh<cr><lf>
+	x.xxx = true heading (degrees)
+	hh = checksum
+__________________________________________________
+
+Port Barometric Pressure  (P_BP)
+Port VaisalaWXT520  barometric sensor reading (WXTP_Pa)
+P_BP data has been corrected for 15.5 meter mast height ( .1185 millibars/m)
+__________________________________________________
+
+Position from GPS receiver (Lat_Lon)
+  Format: decimal Latitude, N/S, decimal Longitude, E/W
+(see decimal_lat and decimal_lon)
+
+Latitude & Longitude values are obtained from the GPS NMEA $GPRMC data sentence.
+The RMC sentence is obtained from the switched GPS receiver (C-Nav, MX512, GP-90D).
+__________________________________________________
+
+QSR_2200  (QSR_2200)
+
+Biospherical Instruments 
+Surface PAR
+
+value in millivolts
+__________________________________________________
+
+Rain Intensity; Stbd WXT520  (WXTS_Ri)
+
+Rain intensity data obtained from Vaisala WXT520, calculated over 10 second intervals. Sensor is mounted on the forward mast, stbd side, 15.5m above the waterline.
+__________________________________________________
+
+Rain accumulation; Port WXT520  (WXTP_Rc)
+Rc = Rain accumulation, (mm) obtained from Vaisala WXT520. (accumulation is updated in 10 sec intervals)
+The accumulation value is reset only when the sensor power is reset. Sensor is mounted on the forward mast, port side, 15.5m above the waterline.
+__________________________________________________
+
+Rain accumulation; Stbd WXT520  (WXTS_Rc)
+Rc = Rain accumulation, (mm) obtained from Vaisala WXT520. (accumulation is updated in 10 sec intervals)
+The accumulation value is reset only when the sensor power is reset. Sensor is mounted on the forward mast, stbd side, 15.5m above the waterline.
+__________________________________________________
+
+Rain intensity; Port WXT520  (WXTP_Ri)
+
+Rain intensity data obtained from Vaisala WXT520, calculated over 10 second intervals. Sensor is mounted on the forward mast, port side, 15.5m above the waterline.
+__________________________________________________
+
+Rel Wind direction; stbd WXT520  (WXTS_Dm)
+Format:  XXX.X  degrees ship relative  (2 Hz samples, 10 sec average).
+A "0" deg wind comes over the bow, "90" deg comes over the stbd side.
+
+Data obtained from Vaisala WXT520 and has not been corrected for sensor mounting alignment error. Sensor is mounted on the forward mast, stbd side, 15.5m above the waterline.
+__________________________________________________
+
+Relative Wind Speed; Stbd WXT520  (WXTS_Sm)
+Format xx.x (m/sec)
+
+Data is obtained from Vaisala WXT520 sensor, mounted on the forward mast, stbd side, 15.5m above the waterline. Wind sampling done at 2 Hz and averaged over 10 seconds - new data is available at 10 second intervals.
+__________________________________________________
+
+Relative wind direction; Port WXT520  (WXTP_Dm)
+Format:  XXX.X  degrees ship relative  (2 Hz samples, 10 sec average).
+A "0" deg wind comes over the bow, "90" deg comes over the stbd side.
+
+Data obtained from Vaisala WXT520 and has not been corrected for sensor mounting alignment error. Sensor is mounted on the forward mast, port side, 15.5m above the waterline.
+__________________________________________________
+
+Relative wind speed; Port WXT520  (WXTP_Sm)
+Format xx.x (m/sec)
+
+Data is obtained from Vaisala WXT520 sensor, mounted on the forward mast, port side, 15.5m above the waterline. Wind sampling done at 2 Hz and averaged over 10 seconds - new data is available at 10 second intervals.
+__________________________________________________
+
+Relative humidity (HRH)
+Format:  xx.xxx (%RH), xx.xxx (C)
+Best source - IMET or Vaisala.
+Sensor is mounted on the forward mast, 15.5m above the waterline.
+__________________________________________________
+
+Relative humidity; Port WXT520  (WXTP_Ua)
+Relative humidity (%) obtained from Vaisala WXT520. Sensor is mounted on the forward mast, port side, 15.5m above the waterline.
+__________________________________________________
+
+Relative humidity; Stbd WXT520  (WXT5_Ua)
+Relative humidity (%) obtained from Vaisala WXT520. Sensor is mounted on the forward mast, stbd side, 15.5m above the waterline.
+__________________________________________________
+
+SBE45 thermosalinograph  (SBE45)
+Data Output Format:
+ttt.tttt, cc.ccccc, sss.ssss, vvvvv.vvv
+where
+t = temperature (degrees Celsius, ITS-90)
+c = conductivity (S/m)   mS/cm = S/m*10
+s = salinity (psu)
+v = sound velocity (meters/second)
+All data is separated with a comma and a space.
+Sensor is mounted in the main lab and connected to the clean seawater system.  The intake for this system is in the bow dome (intake ~5m BWL).
+__________________________________________________
+
+SBE45 conductivity  (SBE45C)
+Format  cc.cccc  (mS/cm)
+__________________________________________________
+
+SBE45 salinity  (SBE45S)
+Format: sss.ssss (psu)
+Surface Salinity from SBE45 located in Main Lab. This value is provided by
+the instrument rather than being calculated from the instrument's temperature
+and conductivity values.
+__________________________________________________
+
+SBE45 sound velocity  (SBE45V)
+Format:  XXXX.X m/sec
+
+SBE45 surface sound velocity (m/sec)
+Sensor located in the main lab and is plumbed into the uncontaminated sea water system. (temperature 
+value is expected to be high - see SSV).
+__________________________________________________
+
+SBE45 temperature  (SBE45T)
+Format: XXX.XXX degrees C
+
+SBE45 temperature (degrees C)
+Sensor located in the main lab, plumbed into the uncontaminated salt water system; intake ~5m BWL.
+__________________________________________________
+
+Sea surface temperature (SBE48 raw data)    ( SST_SBE48)
+Format  xx.xxxx degrees C
+
+Sea surface temperature (C) measured through the hull with a magnetically coupled SBE48. Sensor is located in the bow chamber outboard of the UCSW pump, a few feet aft of the UCSW intake. Sensor housing is contained in an insulation jacket to limit effect of ambient bow chamber air.
+__________________________________________________
+
+Salinity (Salinity)
+ Format:   ss.ssss  (psu)
+ Salinity calculated from SBE45 TMP and SBE45 CND data values in accordance
+ with UNESCO 44. (also see SBE45s)
+__________________________________________________
+
+Sea Surface Conductivity  (SSCND)
+ Formay   xx.xxxx   (mS/cm)
+ Sea surface conductivity obtained from primary source (SBE45)
+__________________________________________________
+
+Sea Surface Temperature  (SSTMP)
+Format   xx.xxxx  (C)
+Sea surface temperature (degrees C) from primary sensor (SBE48). This sensor
+is located in the bow chamber approximately 5m BWL
+This value is used for related "conversion" calculations (i.e. Sound velocity).
+__________________________________________________
+
+Sea Surface Conductivity (FSI)    (SSC_FSI)
+Format:  xx.xxxx     (mmho/cm  or  milli-Siemens/centimeter)
+
+Falmouth Scientific TSG (OCM-S-212) sea surface conductivity sensor mounted in the bow thruster room on the suction side of the clean sea water distribution pump.  Intake is located ~5m below the waterline.
+__________________________________________________
+
+Sea Surface Temperature (FSI)   (SST_FSI)
+Format:  xx.xxxx (mmho/cm  or  milli-Siemens/centimeter)
+
+Falmouth Scientific OTM sensor is mounted in the bow thruster room on the suction side of the clean sea water distribution pump.  Intake is located ~5m below the waterline.
+__________________________________________________
+
+Sea Surface Temperature  (SBE48)
+Format:  xx.xxx degrees C
+
+Sea surface temperature from SBE48. Sensor is mounted in the bow chamber.
+__________________________________________________
+
+Seabeam sound velocity  (SB_SV)
+
+Sea surface sound velocity formatted in accordance with Seabeam requirements.
+Sound velocity data is obatined from the SSV data item.
+__________________________________________________
+
+Ship Heading (HDT)
+Format:   xxx.x    (degrees true)
+
+This is the primary heading data.
+Ship's heading (degrees true) obtained from the $__HDT switched sensor NMEA data.
+__________________________________________________
+
+ShutDown message (Wyse)  (ShutDnMsg)
+__________________________________________________
+
+Sound velocity (SSV)
+Format  xxxx.xxxx  (m/sec)
+Sea surface sound velocity (meters/second) calculated from Salinity and SSTMP data values.
+SSTMP is primary sea surface temperature data obtained from a sensor located in the bow
+chamber ~5m BWL.
+__________________________________________________
+
+Starboard Barometric Pressure  (S_BP)
+Starboard VaisalaWXT520  barometric sensor reading (WXTS_Pa)
+S_BP data has been corrected for 15.5 meter mast height ( .1185 millibars/m)
+__________________________________________________
+
+Surface Irradiance  (SPAR)
+Biospherical Instruments Inc. model no QSR-2240A
+Serial no 16500
+
+Calculated from QSR_2200 value in mv
+With Corrected Lamp Output in Air = .01467 uE/cm2sec
+
+Calibration Scale Factor = 6.0452E+00 V/(uE/cm2sec)
+"(to calculate irradiance, divide the net voltage reading in Volts by this value)"
+
+Net Voltage = ((mv *.001)-.01467) 
+Surface Irradiance = (net voltage)/6.0452 = uE/cm2sec
+__________________________________________________
+
+True wind direction; Port WXT520  (WXTP_TD) - degrees
+
+Values are calculated from the Vaisala WXT520 Weather Transmitter raw data corrected for sensor alignment error and combined with the ship's gyro heading and GPS SOG and COG values. Sensor is mounted on the bow mast, port side, at a height of 15.5m above the waterline.
+__________________________________________________
+
+True wind direction; Stbd WXT520  (WXTS_TD) - degrees
+
+Values are calculated from the Vaisala WXT520 Weather Transmitter raw data corrected for sensor alignment error and combined with the ship's gyro heading and GPS SOG and COG values. Sensor is mounted on the bow mast, stbd side, at a height of 15.5m above the waterline.
+__________________________________________________
+
+True wind direction  (Wnd_TD)
+
+Format  xxx.x  (degrees)
+True wind direction obtained from the pimary wind sensor (IMET). 
+Calculations use hdt, sog, and cog data values.
+__________________________________________________
+
+True wind direction (Wnd_Dir)
+Format:  xxx.x  (degrees)
+Wind direction obtained from the IMET wind sensor and corrected for ship heading (gyro) plus ship course and speed (GPS SOG & COG). Sensor is mounted on the forward mast, 15.5m above the waterline
+__________________________________________________
+
+True wind speed & direction (TWind)
+True wind speed and direction obtained from the IMET wind sensor. See TWnd_Spd and TWnd_Dir
+__________________________________________________
+
+True wind speed & direction; Port WXT520 (WXTP_TSD)
+True wind speed (m/s) and direction (degrees)
+
+Values are calculated from the Vaisala WXT520 Weather Transmitter raw data corrected for sensor alignment error and combined with ship's gyro heading and GPS SOG and COG values. Wind direction is given in meteorological terms; a "0" degree wind comes from the north. Sensor is mounted on the forward mast, port side, 15.5m above the waterline.
+__________________________________________________
+
+True wind speed & direction; Stbd WXT520 (WXTS_TSD)
+True wind speed (m/s) and direction (degrees)
+
+Values are calculated from the Vaisala WXT520 Weather Transmitter raw data corrected for sensor alignment error and combined with ship's gyro heading and GPS SOG and COG values. Wind direction is given in meteorological terms; a "0" degree wind comes from the north. Sensor is mounted on the forward mast, stbd side, 15.5m above the waterline.
+__________________________________________________
+
+True wind speed  (Wnd_TS)
+
+Format  xxx.xxxx  (m/sec)
+True wind speed obtained from the pimary wind sensor (IMET). 
+Calculations use hdt, sog, and cog data values.
+__________________________________________________
+
+True wind speed (Wnd_Spd)
+Format:  xx.xx  (meters/sec)
+
+Wind speed obtained from the IMET wind sensor and corrected for ship heading (gyro) plus ship course and speed (GPS SOG & COG). Sensor is mounted on the forward mast, 15.5m above the waterline.
+__________________________________________________
+
+True wind speed; Port WXT520  (WXTP_TS)
+Format:   xx.x  m/s
+
+Values are calculated from the Port Vaisala WXT520 Weather Transmitter raw data corrected for sensor alignment error and combined with the ship's gyro heading and GPS SOG and COG values.
+__________________________________________________
+
+True wind speed; Stbd WXT520  (WXTS_TS)  m/s
+Format:   xx.x  m/s
+
+Values are calculated from the Stbd Vaisala WXT520 Weather Transmitter raw data corrected for sensor alignment error and combined with the ship's gyro heading and GPS SOG and COG values.
+__________________________________________________
+
+Sea surface fluorometer  (WStar)
+WetLabs Wet-Star fluorometer located in the Hydro Lab clean seawater piping. A MetraByte A/D converter is used to convert the 0-5 vdc fluorometer output to serial data. This device sets the output decimal point as necessary for best resolution, which results in a 1 vdc fluorometer value being represented as +01000.00 in the raw MetraByte serial stream.
+
+WetLabs Wet-Star fluorometer Specifications: 
+Response time: 		0.17 sec (analog); 0.125 sec (digital, optional) 	
+Input: 			7-15 VDC 	
+Output: 		0-5 VDC (analog); 0-4095 counts (digital, optional) 	
+Current draw: 		< 40 mA (analog); < 80 mA (digital, optional) 	
+Linearity: 		= 99% R2
+
+Chlorophyll	
+  Dynamic ranges: 	0.03 -75 µg/l (standard); 0.06-150 µg/l (optional) 	
+  Sensitivity: 	 0.03 µg/l 	
+  Excitation: 	460 nm 	
+  Emission: 	695 nm 	
+CDOM 	
+  Dynamic ranges: 1000 ppb (estuarine waters) 	
+		    250 ppb (near-coastal waters) 	
+		    100 ppb (open ocean waters) 	
+  Sensitivity: 	0.100 ppb quinine sulfate dihydrate 	
+  Excitation: 	370 nm (10 nm FWHM) 	
+  Emission: 	460 nm (120 nm FWHM) 	
+Uranine 	
+  Dynamic range: 0-4000 µg/l uranine 	
+  Sensitivity: 	1 µg/l uranine 	
+  Excitation: 	485 nm 	
+  Emission: 	532 nm 	
+  Rhodamine 	
+  Excitation: 	470 nm 	
+  Emission: 	590 nm 	
+Phycoerythrin 	
+  Excitation: 	525 nm 	
+  Emission: 	575 nm
+__________________________________________________
+
+WXT520 Port MET sensor  (WXTP)
+__________________________________________________
+
+WXT520 Stbd MET sensor  ( WXTS)
+__________________________________________________
+
+Wind XY velocities  (WND_XY)
+
+Ship relative X & Y wind velocities (m/s) obtained from the IMET wind sensor. These values are used to calculate true wind speed and direction.
+__________________________________________________
+
+Wyse (data)  (Wyse_data)
+__________________________________________________
+__________________________________________________
+ 
+Defined constants:
+ 
+gt = 4.2098968e-03
+ht = 5.97866409e-04
+it = 9.66787551e-07
+jt = -2.68184293e-06
+f0t = 1000.0
+gc = -4.02038185e+00
+hc = 4.70943453e-01
+ic = 4.60909512e-03
+jc = -1.56501353e-04
+cpcor = -9.57e-08
+ctcor = 3.25e-06
+MastHeight = 15.5
+IMETSensorOffset = 0.0
+WXT520StbdSensorOffset = 0.42
+WXT520PortSensorOffset = 0.76
+WS425SensorOffset = 0.0
+__________________________________________________
+__________________________________________________
+ 
+Auxiliary information:
+ 
+Calliope Data Files
+September 2, 2008
+
+General considerations - The Calliope system does not normally log all the data available or all the data it obtains and uses internally; it logs a subset on a timed basis individually specified for each data item.  Data is frequently obtained and used for calculations without being logged due to a difference between the data collection interval and the log cycle.  If the log file recording rate was not the same as the data collection rate, post-processing calculations may not give the same answers as the originals even though all calculations are done correctly.  This is because the original calculations would have new data available at the collection rate whereas post-processing would only have the logged data subset.
+
+The true wind calculation provides a good example; determining true wind speed and direction requires the wind sensor data plus heading from a compass or gyro and COG and SOG from a GPS.  Normally heading data is obtained at a rapid rate compared to wind data but they are both recorded at about the same interval.  This means that when the Calliope code makes the true wind calculation it is likely to use newly obtained heading data, which may not be logged.  Clearly, attempting to check the Calliope calculations using the logged data will be difficult but, if the logging rates have been chosen reasonably, post-processing will provide valid, useful results.
+
+Log Files - The Calliope system generates data files of two types: 1) asynchronous, single-item-per-line, time stamped ASCII and 2) synchronous, multi-item-per-line, comma delimited (CSV).  A single file of the first type is always created containing data items logged at the time interval specified by the Calliope configuration.  Each line starts with a data identifier followed by the date and time given in the form used by Visual Basic (number of days since Dec. 31, 1899; the 31st is day #1) and then the time in normal human readable form.  These values are followed by the data terminated with a <cr><lf>.  Log files are normally created at midnight GMT and the name of the file provides ship and creation date information with a “.dat” extension.  The date value within the file name is always based on GMT.  The first line of the file provides ship, date and initialization local time information. The second line indicates the local time zone and the third provides a reminder that Calliope data timestamps are always GMT.  This is followed by a line containing “****” indicating the start of recorded data.
+
+The Calliope data collection application always uses GMT timestamp values regardless of the time zone setting of the application computer.  However, the start time for new data files is controlled by an entry in the configuration file. Regardless of when a file is started, the date information used to construct the file name is based on GMT.  Note however that any date and time information included in the data file headers is local time. If date or time values are included in data files as logged values, these will also be local values (with GMT timestamps). Time values are handled in this manner to allow more convenient use of local time for controlling Calliope’s activities if desired. As an example, starting new files at a particular local time can be preferable to midnight GMT when instrumentation deployment activities are scheduled on a consistant local time basis. Note that GMT will be used exclusively if the computer’s time is set to GMT.
+
+All lines after the header’s “****” contain data as shown in the following example taken from an Oceanus file named “OC020915.dat”.  For this example, most items are being logged at 1-minute intervals; HEHDT, PKEL99, Salinity, and SSV are exceptions. The header indicates that the Calliope computer was set to Azores Standard Time, which is one hour behind GMT. The file was started at approximately midnight local time and the timestamps reflect the 1 hour difference between local and GMT. 
+
+R/V Oceanus Calliope data file, Sun 15/Sep/2002 00:00:11
+Current time zone: Azores Standard Time (GMT-1)
+Data timestamps are GMT
+****
+IMET_WND	37514.00031 01:00:26  1.14 –2.55 2.8 3.3 2.4 161.2 0 4
+IMET_HRH	37514.00031	01:00:26  99.253   19.819
+IMET_SWR  	37514.00031	01:00:26  0.1
+IMET_BPR  	37514.00031	01:00:26  1021.66
+IMET_PRC  	37514.00032	01:00:27  -0.00    0.00   7.69
+SSTMP     	37514.00032	01:00:27  +24.6322
+SSCND     	37514.00032	01:00:27  +50.0594
+HEHDT     	37514.00032	01:00:27  $HEHDT,025.7,T
+PKEL99    	37514.00034	01:00:29  $PKEL99,15.01,00.00,1500
+Salinity  	37514.04216	01:00:42  33.0489
+SSV       	37514.04216	01:00:42  1531.3961
+TWind     	37514.04216	01:00:43  2.7932 181.6
+GPS       	37514.04217	01:00:44  $GPGGA,010043.043,4131.4319,N, 
+07040.3348,W,3,08,1.0,026.0,M,034.4,M,,*75,$GPGXP,010043,4131.4319,N,07
+040.3348,W*5D,$GPGLL,4131.4319,N,07040.3348,W,010043.043,A*21,$GPVTG,34
+1.5,T,357.1,M,000.0,N,000.0,K*4D
+HEHDT     	37514.04228	01:00:58  $HEHDT,025.7,T
+IMET_WND  	37514.04249	01:01:11  1.14 -2.55 2.8 3.3 2.4 161.2 0.0 0 4
+IMET_HRH  	37514.04266	01:01:26  99.253   19.818
+IMET_SWR  	37514.04266	01:01:26  0.1
+IMET_BPR  	37514.04267	01:01:26  1021.71
+IMET_PRC  	37514.04267	01:01:27  0.00    0.00   7.69
+SSTMP     	37514.04268	01:01:27  +24.6304
+SSCND     	37514.04268	01:01:28  +50.0560
+HEHDT     	37514.04268	01:01:28  $HEHDT,025.6,T
+TWind     	37514.04286	01:01:43  2.8356 183.7
+GPS       	37514.04286	01:01:43  $GPGGA,010142.043,4131.4306,N, 
+07040.3343,W,3,08,1.0,028.3,M,034.4,M,,*7D,$GPGXP,010142,4131.4306,N,07
+040.3343,W*58,$GPGLL,4131.4306,N,07040.3343,W,010142.043,A*24,$GPVTG,34
+1.5,T,357.1,M,000.0,N,000.0,K*4D
+HEHDT     	37514.04306	01:01:58  $HEHDT,025.7,T
+IMET_WND  	37514.04318	01:02:11  1.06 -2.63 2.8 3.5 2.4 165.3 0.0 0 4
+IMET_HRH  	37514.04336	01:02:26  99.253   19.804
+IMET_SWR  	37514.04336	01:02:26  0.0
+IMET_BPR  	37514.04336	01:02:26  1021.70
+IMET_PRC  	37514.04336	01:02:26  0.00    0.00   7.70
+SSTMP     	37514.04337	01:02:27  +24.6314
+SSCND     	37514.04337	01:02:27  +50.0593
+HEHDT     	37514.04337	01:02:27  $HEHDT,025.7,T
+PKEL99    	37514.04339	01:02:29  $PKEL99,15.02,00.00,1500
+Salinity  	37514.04354	01:02:42  33.0511
+SSV       	37514.04354	01:02:42  1531.3987
+TWind     	37514.04354	01:02:42  2.5863 181.0
+
+Note that the GPS data in the above example contains line-formatting characters that are not normally present in the real data files.  The GPS data item above was defined as four NMEA sentences and the Calliope program concatenates multi-line data, replacing line termination characters with commas.  <cr><lf> characters are only present at the end of each data item.
+
+The “CSV” format file uses the same naming convention except that an underscore and two-digit number follow the date/time. The extension is always “csv”. CSV files are normally started at midnight GMT but the start time can be delayed by an amount specified in the configuration file. CSV files begin with a header line that identifies the ship and a line that identifies the data items in each of the following comma delimited columns.  The last item in this second line is always the header line’s checksum.  The content of these files can be changed by a number of methods and if this is done, a new file is created having a new file name; the two-digit number following the underscore is incremented. The header line identifying the file’s data items is also corrected.
+
+The rate at which data is added to a CSV file is normally once per minute but this can be changed by an entry in the Calliope configuration file.  Each line begins with a date and GMT time stamp and contains the most recent data available at the time of the entry.  Data is not repeated; if new data is not available when a line is to be added, the corresponding column is left blank.  The final item in each line is the checksum of the data identifier header line - not the data line’s checksum.  This is included so that when data lines of this type are  broadcast to other applications, it is possible for these applications to determine if the correct header is being used.  The following is an example taken from the file “OC020915_00.csv”.
+  
+R/V Oceanus Calliope CSV data file  (timestamps are GMT)
+Date, Time, SSTMP, SSCND, Gyro, Salinity, Wnd_Spd, Wnd_Dir, Depth, HdChkSum=0F 
+2002/09/15, 00:00:25, +24.630, +50.058, 025.7, 33.049, 2.67, 185.4, 115.01, 0F 
+2002/09/15, 00:01:25, +24.631, +50.060, 025.6, 33.050, 2.79, 181.5, 115.02, 0F 
+2002/09/15, 00:02:25, +24.631, +50.059, 025.7, 33.050, 2.83, 183.7, 115.01, 0F 
+2002/09/15, 00:03:25, +24.633, +50.057, 025.7, 33.047, 2.58, 181.0, 115.03, 0F 
+2002/09/15, 00:04:25, +24.633, +50.060, 025.7, 33.049, 2.43, 181.8, 115.06, 0F 
+2002/09/15, 00:05:25, +24.633, +50.057, 025.6, 33.046, 2.66, 178.1, 115.01, 0F
+2002/09/15, 00:06:25, +24.633, +50.057, 025.7, 33.047, 2.49, 179.5, 115.01, 0F
+2002/09/15, 00:07:25, +24.632, +50.060, 025.6, 33.050, 2.71, 181.5, 115.01, 0F
+2002/09/15, 00:08:25, +24.632, +50.061, 025.7, 33.051, 3.02, 179.2, 115.03, 0F
+2002/09/15, 00:09:25, +24.632, +50.058, 025.7, 33.048, 2.76, 180.6, 115.04, 0F
+2002/09/15, 00:10:25, +24.630, +50.058, 025.7, 33.049, 3.03, 178.9, 115.03, 0F
+2002/09/15, 00:11:25, +24.632, +50.058, 025.7, 33.048, 3.47, 178.2, 115.02, 0F
+
+Special Files - A Calliope file entry transaction definition can define special files having a specified name and data content.  The data format will be as described above for the asynchronous .dat file.  Files of this type are generally used to record a limited amount of data, possibly triggered by an “event” of some nature. 
+
+Raw Data Files - The Calliope data input code can be configured to time stamp (GMT) and log all data received on a particular port. The same file name can be specified for more than one port allowing a single raw data file to hold a number of different data items.  Raw data file names are specified when the files are activated; Calliope appends the yymmdd date and will always use a ".dat" extension (i.e. Pitch_080415.dat).
+
+Metadata
+
+The Calliope system generates a metadata file (Metadata.txt - possibly this file).  This is a simple text file containing information on the various data sources listed by sensor name and the designator used in the header information of the primary data file types.  The file also lists the constants defined by files in the Constants directory (i.e. calibration constants) and includes a copy of the file Metadata2.txt (located in the Calliope/Metadata directory), which can contain addition information entered by the application user. Hopefully, the resulting Metadata file contains enough information to make effective use of the data contained in the other files (i.e. format, units, sensor type, calibration dates, etc.).
+
+In addition, there may be a second metadata file in the primary data directory named MetaDataAux.txt.  This file is intended to provide a location for initialization and other functions to store useful but non-data information obtained from sensor interrogations (such as the calibration date of an IMET sensor).  
+
+Timestamp formats
+ 
+The Calliope data collection application always uses GMT timestamp values regardless of the time zone setting of the application computer.  Also, the date used to generate the name of a data file is based on GMT. However, new files are not necessarily started at midnight GMT (file start times are controlled by an entry in the Calliope configuration file) and any date and time information included in data file headers is local time. If date or time values are included as logged values in data files, these will also be local values. The Calliope ".dat" data file headers indicate the local time zone setting when the file was started.     
+ 
+Individual items in Calliope ".dat" data files are time stamped with two different formats. The first timestamp value is in the format used by Microsoft Visual Basic: the number of days since December 31, 1899 (Dec. 31 is day 1, not day 0).  Its primary purpose is to provide a continuously increasing date and time indicator for use in data graphing applications. The VB format facilitates this for some applications but converting the number to the normal human readable form can be painful. The second timestamp value (hh:mm:ss format) in combination with the date in the file header may eliminate the need for this conversion.  If not, the following may be helpful:
+ 
+   00.00 is 00:00:00 on Dec. 30, 1899.
+   00.50 is 12:00:00 (noon) on the same day.
+   35390.58333 is 14:00:00 May 15, 1998.
+

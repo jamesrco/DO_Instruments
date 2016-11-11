@@ -7,7 +7,8 @@
 % aboard the R/V Knorr; met & ship data are from shipboard instruments
 % aboard the Knorr
 
-% The Model "A" instrument used Aanderaa 4330F optodes
+% The Model "A" instrument collected data from Aanderaa 4330F optodes
+% w/default salinity set to 0
 
 % Original script created 7/23/13 by JRC; modf'd 9/4/14, 10/16/15 JRC
 

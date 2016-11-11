@@ -107,12 +107,14 @@ Wink_caltime = find(KN207_1_QL1_20120424_Timestamp_DO>=KN207_1_QL1_dark_Wink_tim
 Wink_diff = KN207_1_QL1_dark_Wink_uM-KN207_1_QL1_20120424_DO_1_dark_uM(Wink_caltime);
 KN207_1_QL1_20120424_DO_1_dark_uM_cal = KN207_1_QL1_20120424_DO_1_dark_uM+Wink_diff;
 
-% truncate data set to include only usable data
+% truncate data set to include only good data
+% burn time was set to 16:30 local; start using data 30 mins after burn
+% began
+% instrument was recovered at 17:08 local time
 
 KN207_1_QL1_20120424_data = [KN207_1_QL1_20120424_Timestamp_DO KN207_1_QL1_20120424_timefrac KN207_1_QL1_20120424_DO_1_dark_uM_cal KN207_1_QL1_20120424_DO_1_dark_temp_degC];
 
-% KN207_1_QL1_20120424_data = KN207_1_QL1_20120424_data(249:2188,:);
-KN207_1_QL1_20120424_data = KN207_1_QL1_20120424_data(1:end,:);
+KN207_1_QL1_20120424_data = KN207_1_QL1_20120424_data(45:2213,:);
 
 KN207_1_QL1_20120424_Timestamp_DO = KN207_1_QL1_20120424_data(:,1);
 KN207_1_QL1_20120424_timefrac = KN207_1_QL1_20120424_data(:,2);
@@ -159,13 +161,14 @@ KN207_1_QL2_dark_Wink_uM=xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/d
 Wink_diff = KN207_1_QL2_dark_Wink_uM-KN207_1_QL2_20120430_DO_1_dark_uM(2038);
 KN207_1_QL2_20120430_DO_1_dark_uM_cal = KN207_1_QL2_20120430_DO_1_dark_uM+Wink_diff;
 
-% truncate data set to include only usable data
+% burn time was set to 19:00 local; start using data 30 mins after burn
+% began; for this deployment, means starting at first string in dataset
+% loaded here
+% instrument was recovered at 12:30 local time on 5/3/12
 
 KN207_1_QL2_20120430_data = [KN207_1_QL2_20120430_Timestamp_DO KN207_1_QL2_20120430_timefrac KN207_1_QL2_20120430_DO_1_dark_uM_cal KN207_1_QL2_20120430_DO_1_dark_temp_degC];
 
-% KN207_1_QL2_20120430_data = KN207_1_QL2_20120430_data(104:2,:);
-
-KN207_1_QL2_20120430_data = KN207_1_QL2_20120430_data(1:2001,:);
+KN207_1_QL2_20120430_data = KN207_1_QL2_20120430_data(1:1964,:);
 
 KN207_1_QL2_20120430_Timestamp_DO = KN207_1_QL2_20120430_data(:,1);
 KN207_1_QL2_20120430_timefrac = KN207_1_QL2_20120430_data(:,2);
@@ -227,15 +230,16 @@ Wink_diff_19Jun=Wink_diff;
 KN207_3_PS1_20120617_DO_1_dark_uM_cal = KN207_3_PS1_20120617_DO_1_dark_uM+Wink_diff;
 KN207_3_PS1_20120617_DO_2_light_uM_cal=(KN207_3_PS1_20120617_DO_2_light_uM+meandarklightdiff)+Wink_diff;
 
-% truncate data set to include only usable data
-
 KN207_3_PS1_20120617_data = [KN207_3_PS1_20120617_Timestamp_DO KN207_3_PS1_20120617_timefrac ...
     KN207_3_PS1_20120617_DO_1_dark_uM_cal KN207_3_PS1_20120617_DO_1_dark_temp_degC ...
     KN207_3_PS1_20120617_DO_2_light_uM_cal KN207_3_PS1_20120617_DO_2_light_temp_degC];
 
-% KN207_3_PS1_20120617_data = KN207_3_PS1_20120617_data(142:1313,:);
+% truncate data set to include only usable data; wire was set to burn at
+% 17:00 GMT (same as local time for this station), begin collecting 30
+% mins after burn started
+% instrument recovered at 10:45 on 6/19/12
 
-KN207_3_PS1_20120617_data = KN207_3_PS1_20120617_data(39:end,:);
+KN207_3_PS1_20120617_data = KN207_3_PS1_20120617_data(84:1321,:);
 
 KN207_3_PS1_20120617_Timestamp_DO = KN207_3_PS1_20120617_data(:,1);
 KN207_3_PS1_20120617_timefrac = KN207_3_PS1_20120617_data(:,2);
@@ -293,13 +297,12 @@ KN207_3_PS2_20120623_DO_1_dark_uM_cal = KN207_3_PS2_20120623_DO_1_dark_uM+Wink_d
 KN207_3_PS2_20120623_DO_2_light_uM_cal=(KN207_3_PS2_20120623_DO_2_light_uM+meandarklightdiff)+Wink_diff;
 
 % truncate data set to include only usable data
-% in this case, we have different ranges for the light and dark bottle data
+% burn started at 16:00 GMT (same as local); begin collecting 30 mins after
+% chambers were damaged during deployment by bearcat so truncating usable
+% segment of data early (22:00 on 6/26/2012)
 
-% lightrange=(105:2730);
-% darkrange=(105:2440);
-
-lightrange=(66:2730);
-darkrange=(66:2825);
+lightrange=(94:2416);
+darkrange=(94:2416);
 
 KN207_3_PS2_20120623_Timestamp_DO_dark = KN207_3_PS2_20120623_Timestamp_DO(darkrange,:);
 KN207_3_PS2_20120623_timefrac_dark = KN207_3_PS2_20120623_timefrac(darkrange,:);
@@ -353,9 +356,11 @@ KN207_3_PS4_20120711_DO_1_dark_uM_cal = KN207_3_PS4_20120711_DO_1_dark_uM+Wink_d
 KN207_3_PS4_20120711_data = [KN207_3_PS4_20120711_Timestamp_DO KN207_3_PS4_20120711_timefrac ...
     KN207_3_PS4_20120711_DO_1_dark_uM_cal KN207_3_PS4_20120711_DO_1_dark_temp_degC];
 
-% KN207_3_PS4_20120711_data = KN207_3_PS4_20120711_data(180:2893,:);
+% truncate data set to include only usable data
+% burn started at 16:00 GMT (same as local); begin collecting 30 mins
+% PHORCYS on deck at 14:30 on 7/11/12
 
-KN207_3_PS4_20120711_data = KN207_3_PS4_20120711_data(52:end,:);
+KN207_3_PS4_20120711_data = KN207_3_PS4_20120711_data(81:2900,:);
 
 KN207_3_PS4_20120711_Timestamp_DO = KN207_3_PS4_20120711_data(:,1);
 KN207_3_PS4_20120711_timefrac = KN207_3_PS4_20120711_data(:,2);

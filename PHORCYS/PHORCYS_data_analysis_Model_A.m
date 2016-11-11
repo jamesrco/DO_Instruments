@@ -425,201 +425,209 @@ spaceinc = 60*24;
 
 scrsz = get(0,'ScreenSize'); % define a screen size variable so I can make figures that look decent
 
-%% ------------- define variables for each station -----------------------
+%% preallocate a matrix to hold our rate data
+% and create matrix with indices to the rate data/metadata for each deployment
 
-%% ------------- KN207-1, QL-1 ----------------------------------
+KN207_Model_A_PHORCYS_met_rates = zeros(5, 8);
 
-% have just dark bottle data for this station
+KN207_Model_A_PHORCYS_met_rates(:,1) = [2071 2071 2073 2073 2073];
+KN207_Model_A_PHORCYS_met_rates(:,2) = [1 2 1 2 4];
 
-dark_uM = KN207_1_QL1_20120424_DO_1_dark_uM;
-timestamp = KN207_1_QL1_20120424_Timestamp_DO;
+KN207_Model_A_PHORCYS_index = table;
 
-%% ------------- KN207-1, QL-2 ----------------------------------
+% populate our index (dark data, dark timestamps, light data, light
+% timestamps)
 
-% have just dark bottle data for this station
+KN207_Model_A_PHORCYS_index.dark_uM = ...
+{'KN207_1_QL1_20120424_DO_1_dark_uM','KN207_1_QL2_20120430_DO_1_dark_uM','KN207_3_PS1_20120617_DO_1_dark_uM','KN207_3_PS2_20120623_DO_1_dark_uM','KN207_3_PS4_20120711_DO_1_dark_uM'}';
 
-dark_uM = KN207_1_QL2_20120430_DO_1_dark_uM;
-timestamp = KN207_1_QL2_20120430_Timestamp_DO;
+KN207_Model_A_PHORCYS_index.dark_timestamp = ...
+{'KN207_1_QL1_20120424_Timestamp_DO','KN207_1_QL2_20120430_Timestamp_DO','KN207_3_PS1_20120617_Timestamp_DO','KN207_3_PS2_20120623_Timestamp_DO_dark','KN207_3_PS4_20120711_Timestamp_DO'}';
 
-%% ------------- KN207-3, PS#1 ----------------------------------
+KN207_Model_A_PHORCYS_index.light_uM = ...
+{'','','KN207_3_PS1_20120617_DO_2_light_uM','KN207_3_PS2_20120623_DO_2_light_uM',''}';
 
-light_uM = KN207_3_PS1_20120617_DO_2_light_uM;
-dark_uM = KN207_3_PS1_20120617_DO_1_dark_uM;
-timestamp = KN207_3_PS1_20120617_Timestamp_DO;
-
-%% ------------- KN207-3, PS#2 ----------------------------------
-
-% the two timeseries at this station are of different length
-
-light_uM = KN207_3_PS2_20120623_DO_2_light_uM;
-dark_uM = KN207_3_PS2_20120623_DO_1_dark_uM;
-timestamp_light = KN207_3_PS2_20120623_Timestamp_DO_light;
-timestamp_dark = KN207_3_PS2_20120623_Timestamp_DO_dark;
-
-%% ------------- KN207-3, PS#4 ----------------------------------
-
-% have just dark bottle data for this station
-
-dark_uM = KN207_3_PS4_20120711_DO_1_dark_uM;
-timestamp = KN207_3_PS4_20120711_Timestamp_DO;
+KN207_Model_A_PHORCYS_index.light_timestamp = ...
+{'','','KN207_3_PS1_20120617_Timestamp_DO','KN207_3_PS2_20120623_Timestamp_DO_light',''}';
 
 %% data analysis
 
 % approach suggested by Emery and Thomson (2001), Data Analysis Meth. in
 % P.O. (see chapters 3 and 5), with additional input from Scott Doney
 
-% first, look at and prepare data for analysis
-
-% remove first-order trend, assumed to be linear, and store the
-% trend in a new variable for each bottle
-
-% light bottle data
-
-light_detrended = detrend(light_uM);
-light_trend = light_uM-light_detrended;
-
-% dark bottle data
-
-dark_detrended = detrend(dark_uM);
-dark_trend = dark_uM-dark_detrended;
-
-% plot full and then and detrended data against time
-
-figure
-hold on
-plot(timestamp,light_uM,'r-')
-plot(timestamp,light_trend,'r--','LineWidth',2)
-plot(timestamp,dark_uM,'b.')
-plot(timestamp,dark_trend,'b--','LineWidth',2)
-hold off
-legend('Light bottle','Light bottle - linear trend','Dark bottle','Dark bottle - linear trend');
-ylabel('Dissolved oxygen (uM)');
-datetick('x','dd mmm yy HH:MM');
-set(gca,'XLim',[timestamp(1) timestamp(length(timestamp))]);
-
-% perform calculations
-
-% ------------------------------------------------------------------------
-% light bottle
-% ------------------------------------------------------------------------
-
-% compute autocorrelations of detrended O2 data out to N/3 using unbiased
-% mode; using xcorr rather than autocorr because I have more control over
-% how the function performs
-
-[Cyy,lags]=xcorr(light_detrended,...
-round(length(light_detrended)/3),'unbiased');
-
-% stem(lags,Cyy) % plot
-
-% compute integral from C(0) out to first zero crossing (approximate
-% time scale of decorrelation)
-
-indc = find(lags==0); % index C(0)
-indzero = find(Cyy(indc:length(lags))<=0,1,'first'); % find zero crossing
-
-Z=trapz(Cyy(indc:indc+indzero)); % compute numerical integral of ACF from
-                                % C(0) to zero crossing
-
-T_unit=Z/max(Cyy); % calculate integral time scale, E&T eqn. 3.15.16a; this value
-             % is in unit increments
-T = T_unit*2; % integral time scale in minutes (data were collected at 1/120 Hz)
-
-% now, calculate effective degrees of freedom, N* (E&T eqn. 3.15.17)
-
-N = length(light_detrended); % no. observations
-dt = 2; % sampling interval in minutes
-
-N_star = (N*dt)/T; % N*, the effective # of degrees of freedom, which should be << N
-
-% next, calculate metabolic rats using simple linear regression of each
-% time series (call linfit.m of Glover et al)
-
-[a,sa,cov,r,del,S] = linfit(timestamp...
-,light_uM,0);
-
-met_rate = a(2); % metabolic rate in umol O2/L/d (from slope)
-
-% compute yhats and SSE
-
-Yhats = a(2)*timestamp+a(1);
-SSE = sum((light_uM-Yhats).^2);
-
-% compute a realistic 'adjusted' sigma using SSE and N* rather than N
-
-sig = SSE/(N_star-2); % also have to subtract 2 to account for the df's lost in the actual calculation
-
-% use this 'adjusted' sigma to obtain a realistic estimate of uncertainty to
-% accompany the slope
-
-met_rate_uncert_adj = sqrt(sig*S/del);
-
-% store result appropriately
-
-NCP = [met_rate met_rate_uncert_adj T]
-
-% ------------------------------------------------------------------------
-% dark bottle
-% ------------------------------------------------------------------------
-
-% compute autocorrelations of detrended O2 data out to N/3 using unbiased
-% mode; using xcorr rather than autocorr because I have more control over
-% how the function performs
-
-[Cyy,lags]=xcorr(dark_detrended,...
-round(length(dark_detrended)/3),'unbiased');
-
-% stem(lags,Cyy) % plot
-
-% compute integral from C(0) out to first zero crossing (approximate
-% time scale of decorrelation)
-
-indc = find(lags==0); % index C(0)
-indzero = find(Cyy(indc:length(lags))<=0,1,'first'); % find zero crossing
-
-Z=trapz(Cyy(indc:indc+indzero)); % compute numerical integral of ACF from
-                                % C(0) to zero crossing
-
-T_unit=Z/max(Cyy); % calculate integral time scale, E&T eqn. 3.15.16a; this value
-             % is in unit increments
-T = T_unit*2; % integral time scale in minutes (data were collected at 1/120 Hz)
-
-% now, calculate effective degrees of freedom, N* (E&T eqn. 3.15.17)
-
-N = length(dark_detrended); % no. observations
-dt = 2; % sampling interval in minutes
-
-N_star = (N*dt)/T; % N*, the effective # of degrees of freedom, which should be << N
-
-% next, calculate metabolic rats using simple linear regression of each
-% time series (call linfit.m of Glover et al)
-
-[a,sa,cov,r,del,S] = linfit(timestamp...
-,dark_uM,0);
-
-met_rate = a(2); % metabolic rate in umol O2/L/d (from slope)
-
-% compute yhats and SSE
-
-Yhats = a(2)*timestamp+a(1);
-SSE = sum((dark_uM-Yhats).^2);
-
-% compute a realistic 'adjusted' sigma using SSE and N* rather than N
-
-sig = SSE/(N_star-2); % also have to subtract 2 to account for the df's lost in the actual calculation
-
-% use this 'adjusted' sigma to obtain a realistic estimate of uncertainty to
-% accompany the slope
-
-met_rate_uncert_adj = sqrt(sig*S/del);
-
-% store result appropriately
-
-GR = [-met_rate met_rate_uncert_adj T]
-
-
-
-
-
-
-
+for i=1:size(KN207_Model_A_PHORCYS_met_rates,1)
+    
+    % first, look at and prepare data for analysis
+    
+    % remove first-order trend, assumed to be linear, and store the
+    % trend in a new variable for each bottle
+    
+    if strcmp(KN207_Model_A_PHORCYS_index.light_uM(i),'') ~= 1
+        
+        % there is light bottle data for this station
+        
+        % light bottle data
+        
+        light_uM = eval(char(KN207_Model_A_PHORCYS_index.light_uM(i)));
+        light_detrended = detrend(eval(char(KN207_Model_A_PHORCYS_index.light_uM(i))));
+        light_trend = eval(char(KN207_Model_A_PHORCYS_index.light_uM(i)))-light_detrended;
+        light_timestamp = eval(char(KN207_Model_A_PHORCYS_index.light_timestamp(i)));
+        
+    end
+    
+    % dark bottle data
+    
+    dark_uM = eval(char(KN207_Model_A_PHORCYS_index.dark_uM(i)));
+    dark_detrended = detrend(eval(char(KN207_Model_A_PHORCYS_index.dark_uM(i))));
+    dark_trend = eval(char(KN207_Model_A_PHORCYS_index.dark_uM(i)))-dark_detrended;
+    dark_timestamp = eval(char(KN207_Model_A_PHORCYS_index.dark_timestamp(i)));
+    
+    % plot full and then and detrended data against time
+    
+    figure
+    hold on
+    if strcmp(KN207_Model_A_PHORCYS_index.light_uM(i),'') ~= 1
+        plot(light_timestamp,light_uM,'r-')
+        plot(light_timestamp,light_trend,'r--','LineWidth',2)
+    end
+    plot(dark_timestamp,dark_uM,'b.')
+    plot(dark_timestamp,dark_trend,'b--','LineWidth',2)
+    hold off
+    if strcmp(KN207_Model_A_PHORCYS_index.light_uM(i),'') ~= 1
+        legend('Light bottle','Light bottle - linear trend','Dark bottle','Dark bottle - linear trend');
+    else
+        legend('Dark bottle','Dark bottle - linear trend');
+    end
+    ylabel('Dissolved oxygen (uM)');
+    datetick('x','dd mmm yy HH:MM');
+    set(gca,'XLim',[dark_timestamp(1) dark_timestamp(length(dark_timestamp))]);
+    
+    % perform calculations
+    
+    % ------------------------------------------------------------------------
+    % light bottle
+    % ------------------------------------------------------------------------
+    
+    if strcmp(KN207_Model_A_PHORCYS_index.light_uM(i),'') ~= 1
+        
+        % compute autocorrelations of detrended O2 data out to N/3 using unbiased
+        % mode; using xcorr rather than autocorr because I have more control over
+        % how the function performs
+        
+        [Cyy,lags]=xcorr(light_detrended,...
+            round(length(light_detrended)/3),'unbiased');
+        
+        % stem(lags,Cyy) % plot
+        
+        % compute integral from C(0) out to first zero crossing (approximate
+        % time scale of decorrelation)
+        
+        indc = find(lags==0); % index C(0)
+        indzero = find(Cyy(indc:length(lags))<=0,1,'first'); % find zero crossing
+        
+        Z=trapz(Cyy(indc:indc+indzero)); % compute numerical integral of ACF from
+        % C(0) to zero crossing
+        
+        T_unit=Z/max(Cyy); % calculate integral time scale, E&T eqn. 3.15.16a; this value
+        % is in unit increments
+        T = T_unit*2; % integral time scale in minutes (data were collected at 1/120 Hz)
+        
+        % now, calculate effective degrees of freedom, N* (E&T eqn. 3.15.17)
+        
+        N = length(light_detrended); % no. observations
+        dt = 2; % sampling interval in minutes
+        
+        N_star = (N*dt)/T; % N*, the effective # of degrees of freedom, which should be << N
+        
+        % next, calculate metabolic rats using simple linear regression of each
+        % time series (call linfit.m of Glover et al)
+        
+        [a,sa,cov,r,del,S] = linfit(light_timestamp...
+            ,light_uM,0);
+        
+        met_rate = a(2); % metabolic rate in umol O2/L/d (from slope)
+        
+        % compute yhats and SSE
+        
+        Yhats = a(2)*light_timestamp+a(1);
+        SSE = sum((light_uM-Yhats).^2);
+        
+        % compute a realistic 'adjusted' sigma using SSE and N* rather than N
+        
+        sig = SSE/(N_star-2); % also have to subtract 2 to account for the df's lost in the actual calculation
+        
+        % use this 'adjusted' sigma to obtain a realistic estimate of uncertainty to
+        % accompany the slope
+        
+        met_rate_uncert_adj = sqrt(sig*S/del);
+        
+        % store result appropriately
+        
+        NCP = [met_rate met_rate_uncert_adj T];
+        
+        KN207_Model_A_PHORCYS_met_rates(i,3:5) = NCP;
+        
+    end
+    
+    % ------------------------------------------------------------------------
+    % dark bottle
+    % ------------------------------------------------------------------------
+    
+    % compute autocorrelations of detrended O2 data out to N/3 using unbiased
+    % mode; using xcorr rather than autocorr because I have more control over
+    % how the function performs
+    
+    [Cyy,lags]=xcorr(dark_detrended,...
+        round(length(dark_detrended)/3),'unbiased');
+    
+    % stem(lags,Cyy) % plot
+    
+    % compute integral from C(0) out to first zero crossing (approximate
+    % time scale of decorrelation)
+    
+    indc = find(lags==0); % index C(0)
+    indzero = find(Cyy(indc:length(lags))<=0,1,'first'); % find zero crossing
+    
+    Z=trapz(Cyy(indc:indc+indzero)); % compute numerical integral of ACF from
+    % C(0) to zero crossing
+    
+    T_unit=Z/max(Cyy); % calculate integral time scale, E&T eqn. 3.15.16a; this value
+    % is in unit increments
+    T = T_unit*2; % integral time scale in minutes (data were collected at 1/120 Hz)
+    
+    % now, calculate effective degrees of freedom, N* (E&T eqn. 3.15.17)
+    
+    N = length(dark_detrended); % no. observations
+    dt = 2; % sampling interval in minutes
+    
+    N_star = (N*dt)/T; % N*, the effective # of degrees of freedom, which should be << N
+    
+    % next, calculate metabolic rats using simple linear regression of each
+    % time series (call linfit.m of Glover et al)
+    
+    [a,sa,cov,r,del,S] = linfit(dark_timestamp...
+        ,dark_uM,0);
+    
+    met_rate = a(2); % metabolic rate in umol O2/L/d (from slope)
+    
+    % compute yhats and SSE
+    
+    Yhats = a(2)*dark_timestamp+a(1);
+    SSE = sum((dark_uM-Yhats).^2);
+    
+    % compute a realistic 'adjusted' sigma using SSE and N* rather than N
+    
+    sig = SSE/(N_star-2); % also have to subtract 2 to account for the df's lost in the actual calculation
+    
+    % use this 'adjusted' sigma to obtain a realistic estimate of uncertainty to
+    % accompany the slope
+    
+    met_rate_uncert_adj = sqrt(sig*S/del);
+    
+    % store result appropriately
+    
+    GR = [-met_rate met_rate_uncert_adj T];
+    
+    KN207_Model_A_PHORCYS_met_rates(i,6:8) = GR;
+    
+end

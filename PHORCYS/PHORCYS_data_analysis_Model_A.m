@@ -78,7 +78,7 @@ KN207_1_QL1_20120424_timefrac = KN207_1_QL1_20120424(:,7);
 KN207_1_QL1_20120424_DO_1_dark_uM_raw = KN207_1_QL1_20120424(:,8);
 KN207_1_QL1_20120424_DO_1_dark_temp_degC = KN207_1_QL1_20120424(:,10);
 
-% adjust DO values for salinity, see Aanderaa manual p. 32
+% adjust DO values for salinity, see Aanderaa 4330/4835 TD269 manual p. 32
 
 KN207_1_QL1_20120424_DO_1_dark_uM = zeros(length(KN207_1_QL1_20120424_DO_1_dark_uM_raw),1);
 
@@ -134,7 +134,7 @@ KN207_1_QL2_20120430_DO_1_dark_temp_degC = KN207_1_QL2_20120430(:,6);
 % KN207_1_QL2_20120430_DO_2_light_sat = KN207_1_QL2_20120430(:,8);
 % KN207_1_QL2_20120430_DO_2_light_temp_degC = KN207_1_QL2_20120430(:,9);
 
-% adjust DO values for salinity, see Aanderaa manual p. 32
+% adjust DO values for salinity, see Aanderaa 4330/4835 TD269 manual p. 32
 
 KN207_1_QL2_20120430_DO_1_dark_uM = zeros(length(KN207_1_QL2_20120430_DO_1_dark_uM_raw),1);
 
@@ -185,7 +185,7 @@ KN207_3_PS1_20120617_DO_2_light_uM_raw = KN207_3_PS1_20120617(:,7);
 KN207_3_PS1_20120617_DO_2_light_sat = KN207_3_PS1_20120617(:,8);
 KN207_3_PS1_20120617_DO_2_light_temp_degC = KN207_3_PS1_20120617(:,9);
 
-% adjust DO values for salinity, see Aanderaa manual p. 32
+% adjust DO values for salinity, see Aanderaa 4330/4835 TD269 manual p. 32
 
 KN207_3_PS1_20120617_DO_1_dark_uM = zeros(length(KN207_3_PS1_20120617_DO_1_dark_uM_raw),1);
 
@@ -257,7 +257,7 @@ KN207_3_PS2_20120623_DO_2_light_uM_raw = KN207_3_PS2_20120623(:,7);
 KN207_3_PS2_20120623_DO_2_light_sat = KN207_3_PS2_20120623(:,10);
 KN207_3_PS2_20120623_DO_2_light_temp_degC = KN207_3_PS2_20120623(:,11);
 
-% adjust DO values for salinity, see Aanderaa manual p. 32
+% adjust DO values for salinity, see Aanderaa 4330/4835 TD269 manual p. 32
 
 KN207_3_PS2_20120623_DO_1_dark_uM = zeros(length(KN207_3_PS2_20120623_DO_1_dark_uM_raw),1);
 
@@ -322,7 +322,7 @@ KN207_3_PS4_20120711_DO_1_dark_uM_raw = KN207_3_PS4_20120711(:,7);
 KN207_3_PS4_20120711_DO_1_dark_sat = KN207_3_PS4_20120711(:,9);
 KN207_3_PS4_20120711_DO_1_dark_temp_degC = KN207_3_PS4_20120711(:,10);
 
-% adjust DO values for salinity, see Aanderaa manual p. 32
+% adjust DO values for salinity, see Aanderaa 4330/4835 TD269 manual p. 32
 
 KN207_3_PS4_20120711_DO_1_dark_uM = zeros(length(KN207_3_PS4_20120711_DO_1_dark_uM_raw),1);
 
@@ -374,7 +374,7 @@ KN207_3_PS4_20120711_DO_1_dark_temp_degC = KN207_3_PS4_20120711_data(:,4);
 % Pal_20131231_DO_1_dark_sat = Pal_20131231(:,5);
 % Pal_20131231_DO_1_dark_temp_degC = Pal_20131231(:,8);
 % 
-% % adjust DO values for salinity, see Aanderaa manual p. 32
+% % adjust DO values for salinity, see Aanderaa 4330/4835 TD269 manual p. 32
 % 
 % Pal_20131231_DO_1_dark_uM = zeros(length(Pal_20131231_DO_1_dark_uM_raw),1);
 % 

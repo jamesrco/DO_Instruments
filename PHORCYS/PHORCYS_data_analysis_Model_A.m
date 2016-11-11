@@ -8,7 +8,9 @@
 % aboard the Knorr
 
 % The Model "A" instrument collected data from Aanderaa 4330F optodes
-% w/default salinity set to 0
+% w/default salinity set to 0; since the optodes had not been recently
+% calibrated, values are pegged to the oxygen concentrations measured in
+% the initial set of Winkler titrations used for evaluation at each station
 
 % Original script created 7/23/13 by JRC; modf'd 9/4/14, 10/16/15 JRC
 

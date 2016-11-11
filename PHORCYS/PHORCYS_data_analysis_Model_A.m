@@ -110,11 +110,11 @@ KN207_1_QL1_20120424_DO_1_dark_uM_cal = KN207_1_QL1_20120424_DO_1_dark_uM+Wink_d
 % truncate data set to include only good data
 % burn time was set to 16:30 local; start using data 30 mins after burn
 % began
-% instrument was recovered at 17:08 local time
+% recovery began at 16:30 local time
 
 KN207_1_QL1_20120424_data = [KN207_1_QL1_20120424_Timestamp_DO KN207_1_QL1_20120424_timefrac KN207_1_QL1_20120424_DO_1_dark_uM_cal KN207_1_QL1_20120424_DO_1_dark_temp_degC];
 
-KN207_1_QL1_20120424_data = KN207_1_QL1_20120424_data(45:2213,:);
+KN207_1_QL1_20120424_data = KN207_1_QL1_20120424_data(45:2194,:);
 
 KN207_1_QL1_20120424_Timestamp_DO = KN207_1_QL1_20120424_data(:,1);
 KN207_1_QL1_20120424_timefrac = KN207_1_QL1_20120424_data(:,2);
@@ -464,8 +464,9 @@ KN207_Model_A_PHORCYS_index.light_timestamp = ...
 
 %% data analysis
 
-% approach suggested by Emery and Thomson (2001), Data Analysis Meth. in
-% P.O. (see chapters 3 and 5), with additional input from Scott Doney
+% approach for uncertainty estimation suggested by Emery and Thomson
+% (2001), Data Analysis Meth. in P.O. (see chapters 3 and 5), with
+% additional input from Scott Doney
 
 for i=1:size(KN207_Model_A_PHORCYS_met_rates,1)
     

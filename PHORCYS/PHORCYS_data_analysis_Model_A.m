@@ -431,6 +431,10 @@ scrsz = get(0,'ScreenSize'); % define a screen size variable so I can make figur
 
 KN207_Model_A_PHORCYS_met_rates = zeros(5, 8);
 
+% data stored in KN207_Model_A_PHORCYS_met_rates:
+% cruise ID (KN207-1 or KN207-1); process station ID; NCP (rate,
+% uncertainty, T; all in umol O2 per L per day); GR (rate, uncertainty, T)
+
 KN207_Model_A_PHORCYS_met_rates(:,1) = [2071 2071 2073 2073 2073];
 KN207_Model_A_PHORCYS_met_rates(:,2) = [1 2 1 2 4];
 

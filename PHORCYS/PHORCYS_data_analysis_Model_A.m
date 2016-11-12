@@ -435,6 +435,7 @@ scrsz = get(0,'ScreenSize'); % define a screen size variable so I can make figur
 
 %% preallocate a matrix to hold our rate data
 % and create matrix with indices to the rate data/metadata for each deployment
+% and a date/time object to record start and endpoints for each deployment
 
 KN207_Model_A_PHORCYS_met_rates = zeros(5, 8);
 
@@ -461,6 +462,10 @@ KN207_Model_A_PHORCYS_index.light_uM = ...
 
 KN207_Model_A_PHORCYS_index.light_timestamp = ...
 {'','','KN207_3_PS1_20120617_Timestamp_DO','KN207_3_PS2_20120623_Timestamp_DO_light',''}';
+
+% date/time object
+
+KN207_Model_A_PHORCYS_deploy_times = [repelem(datetime(),5)' repelem(datetime(),5)'];
 
 %% data analysis
 
@@ -643,4 +648,10 @@ for i=1:size(KN207_Model_A_PHORCYS_met_rates,1)
     
     KN207_Model_A_PHORCYS_met_rates(i,6:8) = GR;
     
+    % ------------------------------------------------------------------------
+    % deployment start/end timestamps
+    % ------------------------------------------------------------------------
+
+    KN207_Model_A_PHORCYS_deploy_times(i,1:2) = ...
+        [datetime(datestr(dark_timestamp(1))) datetime(datestr(dark_timestamp(length(dark_timestamp))))];
 end

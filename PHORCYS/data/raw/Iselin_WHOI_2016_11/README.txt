@@ -1,6 +1,8 @@
-PHORCYS (Model "B") dissolved oxygen data from Iselin dock (WHOI) test well deployment in November 2016. 
+PHORCYS (Model "B") dissolved oxygen data from Iselin dock (WHOI) test well deployment in November 2016.
 
 Data are from three Aanderaa Model 4531 Aqua Oxygen Optodes (note these are not same optodes as used in the Model "A" PHORCYS).
+
+*** These data are salinity uncorrected. Default instrument salinity of 0 was used when these data were collected. ***
 
 Questions: Jamie Collins, james.r.collins@aya.yale.edu; Paul Fucile, pfucile@whoi.edu; Ben Van Mooy, bvanmooy@whoi.edu
 

@@ -169,21 +169,34 @@ for i=1:size(Iselin_Nov16_Model_B_PHORCYS_met_rates,1)
     % plot full and then and detrended data against time
     
     figure
+    
+    h(1) = subplot(10,1,1:7); % upper plot
+    
     hold on
+    
     plot(timestamp_local,light_uM,'r-')
     plot(timestamp_local,light_trend,'r--','LineWidth',2)
-    plot(timestamp_local,dark_uM,'b.')
+    plot(timestamp_local,dark_uM,'b-')
     plot(timestamp_local,dark_trend,'b--','LineWidth',2)
-    plot(timestamp_local,ambient_uM,'g.')
+    plot(timestamp_local,ambient_uM,'g-')
     plot(timestamp_local,ambient_trend,'g--','LineWidth',2)
-
+    
     hold off
+    
     legend('Light bottle','Light bottle - linear trend',...
         'Dark bottle','Dark bottle - linear trend',...
         'Ambient','Ambient - linear trend');
     ylabel('Dissolved oxygen (uM)');
     datetick('x','dd mmm yy HH:MM');
     set(gca,'XLim',[datenum(timestamp_local(1)) datenum(timestamp_local(length(timestamp_local)))]);
+    
+    h(2) = subplot(10,1,9:10); % lower plot
+    
+    plot(datenum(timestamp_local),ambient_T_deg_C,'c-');
+    ylabel('Temperature (deg. C)')
+    datetick('x','dd mmm yy HH:MM');
+    set(gca,'XLim',[datenum(timestamp_local(1)) datenum(timestamp_local(length(timestamp_local)))]);
+    
     
     % now, can calculate rates by linear regression & make error estimates
     % using the Emery and Thompson method

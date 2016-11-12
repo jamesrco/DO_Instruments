@@ -78,6 +78,10 @@ Iselin_Nov16_Model_B_PHORCYS_met_rates = zeros(8,6);
 % NCP (rate, uncertainty, T; all in umol O2 per L per day);
 % GR (rate, uncertainty, T)
 
+% date/time object to hold start/end times
+
+Iselin_Nov16_Model_B_PHORCYS_segment_times = [repelem(datetime(),8)' repelem(datetime(),8)'];
+
 % note that the segment start time is not the same as the file start time
 % since the chamber remains open for some fixed period of time during which
 % water is exchanged (can tell this from the binary chamber status
@@ -305,6 +309,13 @@ for i=1:size(Iselin_Nov16_Model_B_PHORCYS_met_rates,1)
     GR = [-met_rate met_rate_uncert_adj T];
     
     Iselin_Nov16_Model_B_PHORCYS_met_rates(i,4:6) = GR;
+    
+    % ------------------------------------------------------------------------
+    % segment start/end times
+    % ------------------------------------------------------------------------
+
+    Iselin_Nov16_Model_B_PHORCYS_segment_times(i,1:2) = ...
+        [timestamp_local(1) timestamp_local(length(timestamp_local))];
     
 end
     

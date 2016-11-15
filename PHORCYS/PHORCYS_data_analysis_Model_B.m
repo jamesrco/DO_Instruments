@@ -168,7 +168,11 @@ for i=1:size(Iselin_Nov16_Model_B_PHORCYS_met_rates,1)
     
     % plot full and then and detrended data against time
     
-    figure
+    fh = figure(i);
+    set(fh, ...
+        'PaperSize', [8.5 11], ...
+        'PaperPosition', [0.01 0.01 10.5 7.5], ...
+        'PaperOrientation', 'landscape') ;
     
     h(1) = subplot(10,1,1:7); % upper plot
     
@@ -197,7 +201,10 @@ for i=1:size(Iselin_Nov16_Model_B_PHORCYS_met_rates,1)
     datetick('x','dd mmm yy HH:MM');
     set(gca,'XLim',[datenum(timestamp_local(1)) datenum(timestamp_local(length(timestamp_local)))]);
     
-    
+    % save plot to file, if desired
+            
+    print(fh,'-dpdf',['PHORCYS_' Iselin_Nov16_Model_B_PHORCYS_file_index{i} '.pdf']) ;
+
     % now, can calculate rates by linear regression & make error estimates
     % using the Emery and Thompson method
     

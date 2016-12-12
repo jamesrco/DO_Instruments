@@ -72,11 +72,13 @@ scrsz = get(0,'ScreenSize'); % define a screen size variable so I can make figur
 % preallocate a matrix to hold our rate data and create matrix with indices
 % to the data files for each time segment; have 8 segments total
 
-Iselin_Nov16_Model_B_PHORCYS_met_rates = zeros(8,6);
+Iselin_Nov16_Model_B_PHORCYS_met_rates = zeros(8,11);
 
 % data stored in Iselin_Nov16_Model_B_PHORCYS_met_rates:
-% NCP (rate, uncertainty, T; all in umol O2 per L per day);
-% GR (rate, uncertainty, T)
+% NCP (rate, uncertainty adjusted for effective deg. of freedom, SE of regression slope,
+% T; all in umol O2 per L per day); GR (rate, uncertainty adjusted for 
+% effective deg. of freedom, SE of regression slope, T); no. observations;
+% no effective deg. of freedom (N*), duration (hours)
 
 % date/time object to hold start/end times
 
@@ -265,9 +267,9 @@ for i=1:size(Iselin_Nov16_Model_B_PHORCYS_met_rates,1)
     
     % store result appropriately
     
-    NCP = [met_rate met_rate_uncert_adj T];
+    NCP = [met_rate met_rate_uncert_adj sa(2) T];
     
-    Iselin_Nov16_Model_B_PHORCYS_met_rates(i,1:3) = NCP;
+    Iselin_Nov16_Model_B_PHORCYS_met_rates(i,1:4) = NCP;
     
     % ------------------------------------------------------------------------
     % dark bottle
@@ -326,9 +328,9 @@ for i=1:size(Iselin_Nov16_Model_B_PHORCYS_met_rates,1)
     
     % store result appropriately
     
-    GR = [-met_rate met_rate_uncert_adj T];
+    GR = [-met_rate met_rate_uncert_adj sa(2) T];
     
-    Iselin_Nov16_Model_B_PHORCYS_met_rates(i,4:6) = GR;
+    Iselin_Nov16_Model_B_PHORCYS_met_rates(i,5:8) = GR;
     
     % ------------------------------------------------------------------------
     % segment start/end times
@@ -336,6 +338,14 @@ for i=1:size(Iselin_Nov16_Model_B_PHORCYS_met_rates,1)
 
     Iselin_Nov16_Model_B_PHORCYS_segment_times(i,1:2) = ...
         [timestamp_local(1) timestamp_local(length(timestamp_local))];
+    
+        % store no. observations, N*, duration
+    
+    Iselin_Nov16_Model_B_PHORCYS_met_rates(i,9) = N;
+    Iselin_Nov16_Model_B_PHORCYS_met_rates(i,10) = N_star;
+    Iselin_Nov16_Model_B_PHORCYS_met_rates(i,11) = datenum(Iselin_Nov16_Model_B_PHORCYS_segment_times(i,2)-...
+    Iselin_Nov16_Model_B_PHORCYS_segment_times(i,1))*24;
+    
     
 end
     

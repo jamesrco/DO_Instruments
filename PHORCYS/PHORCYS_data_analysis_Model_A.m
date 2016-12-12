@@ -437,11 +437,15 @@ scrsz = get(0,'ScreenSize'); % define a screen size variable so I can make figur
 % and create matrix with indices to the rate data/metadata for each deployment
 % and a date/time object to record start and endpoints for each deployment
 
-KN207_Model_A_PHORCYS_met_rates = zeros(5, 8);
+KN207_Model_A_PHORCYS_met_rates = zeros(5, 13);
 
 % data stored in KN207_Model_A_PHORCYS_met_rates:
 % cruise ID (KN207-1 or KN207-1); process station ID; NCP (rate,
-% uncertainty, T; all in umol O2 per L per day); GR (rate, uncertainty, T)
+% uncertainty adjusted for effective deg. of freedom, SE of regression slope,
+% T; all in umol O2 per L per day); GR (rate, uncertainty adjusted for 
+% effective deg. of freedom, SE of regression slope, T); no. observations;
+% no effective deg. of freedom (N*); incu. duration in hrs
+% 
 
 KN207_Model_A_PHORCYS_met_rates(:,1) = [2071 2071 2073 2073 2073];
 KN207_Model_A_PHORCYS_met_rates(:,2) = [1 2 1 2 4];
@@ -581,9 +585,9 @@ for i=1:size(KN207_Model_A_PHORCYS_met_rates,1)
         
         % store result appropriately
         
-        NCP = [met_rate met_rate_uncert_adj T];
+        NCP = [met_rate met_rate_uncert_adj sa(2) T];
         
-        KN207_Model_A_PHORCYS_met_rates(i,3:5) = NCP;
+        KN207_Model_A_PHORCYS_met_rates(i,3:6) = NCP;
         
     end
     
@@ -644,9 +648,9 @@ for i=1:size(KN207_Model_A_PHORCYS_met_rates,1)
     
     % store result appropriately
     
-    GR = [-met_rate met_rate_uncert_adj T];
+    GR = [-met_rate met_rate_uncert_adj sa(2) T];
     
-    KN207_Model_A_PHORCYS_met_rates(i,6:8) = GR;
+    KN207_Model_A_PHORCYS_met_rates(i,7:10) = GR;
     
     % ------------------------------------------------------------------------
     % deployment start/end timestamps
@@ -654,4 +658,12 @@ for i=1:size(KN207_Model_A_PHORCYS_met_rates,1)
 
     KN207_Model_A_PHORCYS_deploy_times(i,1:2) = ...
         [datetime(datestr(dark_timestamp(1))) datetime(datestr(dark_timestamp(length(dark_timestamp))))];
+    
+    % store no. observations, N*, duration
+    
+    KN207_Model_A_PHORCYS_met_rates(i,11) = N;
+    KN207_Model_A_PHORCYS_met_rates(i,12) = N_star;
+    KN207_Model_A_PHORCYS_met_rates(i,13) = datenum(KN207_Model_A_PHORCYS_deploy_times(i,2)-...
+        KN207_Model_A_PHORCYS_deploy_times(i,1))*24;
+    
 end

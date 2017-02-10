@@ -473,6 +473,14 @@ for i=1:length(Deploy_queue)
         AutoBOD_data.Temp_deg_C = (2*AutoBOD_rawdata{IR_temp_bottle_posit}-...
             27315)/100;
         
+%         % If user wanted to calculate IR temp from the values read inside
+%         % the IR sensor itself
+%
+%         % *** Not *** desirable, based on some early diagnostics
+%         
+%         AutoBOD_data.Temp_deg_C = (2*AutoBOD_rawdata{IR_temp_sensor_posit}-...
+%             27315)/100;
+        
     elseif IR_tempcalc == 'N'
         
         AutoBOD_data.Temp_deg_C = AutoBOD_rawdata{Temp_OEM_posit};

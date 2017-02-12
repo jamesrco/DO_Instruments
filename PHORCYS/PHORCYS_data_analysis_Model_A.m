@@ -561,6 +561,9 @@ for i=1:size(KN207_Model_A_PHORCYS_met_rates,1)
         
         N_star = (N*dt)/T; % N*, the effective # of degrees of freedom, which should be << N
         
+        % *** Note that the N* notation of Emery and Thompson is equivalent to the notation
+        % N_eff used in the Collins et al. PHORCYS manuscript ***
+        
         % next, calculate metabolic rats using simple linear regression of each
         % time series (call linfit.m of Glover et al)
         
@@ -575,6 +578,9 @@ for i=1:size(KN207_Model_A_PHORCYS_met_rates,1)
         SSE = sum((light_uM-Yhats).^2);
         
         % compute a realistic 'adjusted' sigma using SSE and N* rather than N
+
+        % *** Note that the N* notation of Emery and Thompson is equivalent to the notation
+        % N_eff used in the Collins et al. PHORCYS manuscript ***
         
         sig = SSE/(N_star-2); % also have to subtract 2 to account for the df's lost in the actual calculation
         
@@ -624,6 +630,9 @@ for i=1:size(KN207_Model_A_PHORCYS_met_rates,1)
     
     N_star = (N*dt)/T; % N*, the effective # of degrees of freedom, which should be << N
     
+    % *** Note that the N* notation of Emery and Thompson is equivalent to the notation
+    % N_eff used in the Collins et al. PHORCYS manuscript ***
+
     % next, calculate metabolic rats using simple linear regression of each
     % time series (call linfit.m of Glover et al)
     
@@ -638,6 +647,9 @@ for i=1:size(KN207_Model_A_PHORCYS_met_rates,1)
     SSE = sum((dark_uM-Yhats).^2);
     
     % compute a realistic 'adjusted' sigma using SSE and N* rather than N
+    
+    % *** Note that the N* notation of Emery and Thompson is equivalent to the notation
+    % N_eff used in the Collins et al. PHORCYS manuscript ***
     
     sig = SSE/(N_star-2); % also have to subtract 2 to account for the df's lost in the actual calculation
     

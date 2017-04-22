@@ -43,7 +43,7 @@ C_0 = -3.11680e-7;
 
 % read in KN207-1 met data
 
-KN207_1_metdata = xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207_1_met_data.xlsx');
+KN207_1_metdata = xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207_1_met_data.xlsx');
 KN207_1_mettime = KN207_1_metdata(:,3);
 KN207_1_mettime = x2mdate(KN207_1_mettime,1);
 KN207_1_SPAR_uE_cm2_s = KN207_1_metdata(:,4);
@@ -56,7 +56,7 @@ KN207_1_SPAR_uE_cm2_s(KN207_1_SPAR_uE_cm2_s<=0) = 0;
 
 % read in KN207-3 met data
 
-KN207_3_metdata = xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/KN207_03_alongtrack.xlsx');
+KN207_3_metdata = xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/KN207_03_alongtrack.xlsx');
 KN207_3_mettime = KN207_3_metdata(:,7);
 KN207_3_mettime = x2mdate(KN207_3_mettime,1);
 KN207_3_SPAR_uE_cm2_s = KN207_3_metdata(:,19);
@@ -73,7 +73,7 @@ KN207_3_SPAR_uE_cm2_s(KN207_3_SPAR_uE_cm2_s<=0) = 0;
 % rad data not loaded -- instrument was deployed too deeply to see any
 % signal in clear bottle
 
-KN207_1_QL1_20120424 = xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207_1_QL1_PHORCYS_Drifter_2012_04_24_27.xlsx','Clean data');
+KN207_1_QL1_20120424 = xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207_1_QL1_PHORCYS_Drifter_2012_04_24_27.xlsx','Clean data');
 
 KN207_1_QL1_20120424_Timestamp_DO = KN207_1_QL1_20120424(:,6);
 KN207_1_QL1_20120424_Timestamp_DO = x2mdate(KN207_1_QL1_20120424_Timestamp_DO,1);
@@ -94,12 +94,12 @@ end
 
 % load Winkler data
 
-KN207_1_QL1_dark_Wink_time=xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207data_Winklers_oxygen.xlsx','Usefully distilled!','B9');
+KN207_1_QL1_dark_Wink_time=xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207data_Winklers_oxygen.xlsx','Usefully distilled!','B9');
 KN207_1_QL1_dark_Wink_time=addtodate(KN207_1_QL1_dark_Wink_time,-4,'year');
 KN207_1_QL1_dark_Wink_time=addtodate(KN207_1_QL1_dark_Wink_time,-1,'day'); 
 KN207_1_QL1_dark_Wink_time=addtodate(KN207_1_QL1_dark_Wink_time,-1,'hour'); % Winkler spreadsheet using 1904 date system
 KN207_1_QL1_dark_Wink_time = x2mdate(KN207_1_QL1_dark_Wink_time,1);
-KN207_1_QL1_dark_Wink_uM=xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207data_Winklers_oxygen.xlsx','Usefully distilled!','G9');
+KN207_1_QL1_dark_Wink_uM=xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207data_Winklers_oxygen.xlsx','Usefully distilled!','G9');
 
 % calibrate to Winklers
 
@@ -127,7 +127,7 @@ KN207_1_QL1_20120424_DO_1_dark_temp_degC = KN207_1_QL1_20120424_data(:,4);
 
 % rad data not loaded -- light bottle malfunctioned
 
-KN207_1_QL2_20120430 = xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207_1_QL2_PHORCYS_Drifter_2012_04_30_05_03.xlsx','Working data');
+KN207_1_QL2_20120430 = xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207_1_QL2_PHORCYS_Drifter_2012_04_30_05_03.xlsx','Working data');
 
 KN207_1_QL2_20120430_Timestamp_DO = KN207_1_QL2_20120430(:,2);
 KN207_1_QL2_20120430_Timestamp_DO = x2mdate(KN207_1_QL2_20120430_Timestamp_DO,1);
@@ -152,9 +152,9 @@ end
 
 % load Winkler data
 
-KN207_1_QL2_dark_Wink_time=xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207oxygen_data_final.xlsx','QL2 data','B7');
+KN207_1_QL2_dark_Wink_time=xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207oxygen_data_final.xlsx','QL2 data','B7');
 KN207_1_QL2_dark_Wink_time = x2mdate(KN207_1_QL2_dark_Wink_time,1);
-KN207_1_QL2_dark_Wink_uM=xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207oxygen_data_final.xlsx','QL2 data','G7');
+KN207_1_QL2_dark_Wink_uM=xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_1/KN207oxygen_data_final.xlsx','QL2 data','G7');
 
 % calibrate to Winklers
 
@@ -179,7 +179,7 @@ KN207_1_QL2_20120430_DO_1_dark_temp_degC = KN207_1_QL2_20120430_data(:,4);
 % read in data for NA VICE (KN207-3) Process Station #1, 17-19 June 2012
 % -------------------------------------------------------------------------
 
-KN207_3_PS1_20120617 = xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/KN207_3_Process_Station_1_PHORCYS_2012_06_17_19.xlsx','Working data','A6:I1403');
+KN207_3_PS1_20120617 = xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/KN207_3_Process_Station_1_PHORCYS_2012_06_17_19.xlsx','Working data','A6:I1403');
 
 KN207_3_PS1_20120617_Timestamp_DO = KN207_3_PS1_20120617(:,1);
 KN207_3_PS1_20120617_Timestamp_DO = x2mdate(KN207_3_PS1_20120617_Timestamp_DO,1);
@@ -213,9 +213,9 @@ end
 
 % load Winkler data
 
-KN207_3_PS1_dark_Wink_time=xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/KN207_3_Process_Station_1_PHORCYS_2012_06_17_19.xlsx','Winklers','A8');
+KN207_3_PS1_dark_Wink_time=xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/KN207_3_Process_Station_1_PHORCYS_2012_06_17_19.xlsx','Winklers','A8');
 KN207_3_PS1_dark_Wink_time = x2mdate(KN207_3_PS1_dark_Wink_time,1);
-KN207_3_PS1_dark_Wink_uM=xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/KN207_3_Process_Station_1_PHORCYS_2012_06_17_19.xlsx','Winklers','I8');
+KN207_3_PS1_dark_Wink_uM=xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/KN207_3_Process_Station_1_PHORCYS_2012_06_17_19.xlsx','Winklers','I8');
 
 % normalize light bottle data to calibrated dark bottle data
 
@@ -252,7 +252,7 @@ KN207_3_PS1_20120617_DO_2_light_temp_degC = KN207_3_PS1_20120617_data(:,6);
 % read in data for NA VICE (KN207-3) Process Station #2, 23-27 June 2012,
 % -------------------------------------------------------------------------
 
-KN207_3_PS2_20120623 = xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/PHORCYS_2012_06_23_27_working.xlsx','Working data','A6:K2930');
+KN207_3_PS2_20120623 = xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/PHORCYS_2012_06_23_27_working.xlsx','Working data','A6:K2930');
 
 KN207_3_PS2_20120623_Timestamp_DO = KN207_3_PS2_20120623(:,1);
 KN207_3_PS2_20120623_Timestamp_DO = x2mdate(KN207_3_PS2_20120623_Timestamp_DO,1);
@@ -319,7 +319,7 @@ KN207_3_PS2_20120623_DO_2_light_temp_degC = KN207_3_PS2_20120623_DO_2_light_temp
 
 % rad data not loaded -- clear bottle did not close
 
-KN207_3_PS4_20120711 = xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/PHORCYS_2012_07_07_11_working.xlsx','Working data','A6:M2943');
+KN207_3_PS4_20120711 = xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/PHORCYS_2012_07_07_11_working.xlsx','Working data','A6:M2943');
 
 KN207_3_PS4_20120711_Timestamp_DO = KN207_3_PS4_20120711(:,5);
 KN207_3_PS4_20120711_Timestamp_DO = x2mdate(KN207_3_PS4_20120711_Timestamp_DO,1);
@@ -341,9 +341,9 @@ end
 
 % load Winkler data
 
-KN207_3_PS4_dark_Wink_time=xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/PHORCYS_2012_07_07_11_working.xlsx','Winkler data','A11');
+KN207_3_PS4_dark_Wink_time=xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/PHORCYS_2012_07_07_11_working.xlsx','Winkler data','A11');
 KN207_3_PS4_dark_Wink_time = x2mdate(KN207_3_PS4_dark_Wink_time,1);
-KN207_3_PS4_dark_Wink_uM=xlsread('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/PHORCYS_2012_07_07_11_working.xlsx','Winkler data','J11');
+KN207_3_PS4_dark_Wink_uM=xlsread('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/KN207_3/PHORCYS_2012_07_07_11_working.xlsx','Winkler data','J11');
 
 % calibrate dark data to Winklers
 

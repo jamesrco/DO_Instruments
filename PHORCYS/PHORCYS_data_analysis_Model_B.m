@@ -115,7 +115,7 @@ for i=1:size(Iselin_Nov16_Model_B_PHORCYS_met_rates,1)
     
     % get file path, open file
     
-    fn = char(strcat('/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/Iselin_WHOI_2016_11/',cellstr(Iselin_Nov16_Model_B_PHORCYS_file_index{i})));
+    fn = char(strcat('/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/Iselin_WHOI_2016_11/',cellstr(Iselin_Nov16_Model_B_PHORCYS_file_index{i})));
     
     % read in data for this segment
     

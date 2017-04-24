@@ -14,6 +14,9 @@
 % https://github.com/jamesrco/DO_Instruments under a GNU General Public
 % License v. 3
 
+% Some edits were necessary to get the script working under MATLAB 2017a;
+% not sure whether the script is currently backward-compatible
+
 % Dependencies/required files:
 
 % The function linfit.m, available from
@@ -120,7 +123,7 @@ for i=1:size(Iselin_Nov16_Model_B_PHORCYS_met_rates,1)
     % read in data for this segment
     
     PHORdata_raw = readtable(fn,'Delimiter',',','ReadVariableNames',0);
-    
+   
     % first, truncate to omit data collected at the beginning of each
     % segment while the chamber was still open
     
@@ -129,7 +132,7 @@ for i=1:size(Iselin_Nov16_Model_B_PHORCYS_met_rates,1)
     % parse necessary data into different variables
     
     bottle_status = table2array(PHORdata(:,6));
-    date = PHORdata(:,2);
+    date = char(datestr(PHORdata.Var2));
     time_local = PHORdata(:,3);
     light_uM_raw = table2array(PHORdata(:,10));
     light_T_deg_C = table2array(PHORdata(:,12));
@@ -141,9 +144,21 @@ for i=1:size(Iselin_Nov16_Model_B_PHORCYS_met_rates,1)
     % create a timestamp
     % all time values for this deployment were recorded in local time
     
-    timestamp_local = datetime(horzcat(char(table2cell(date)),char(table2cell(time_local))),...
-        'InputFormat','MM/d/yyHH:mm:ss');
+    timestamp_local_uncorrected = datetime(horzcat(char(cellstr(date)),char(table2cell(time_local))),...
+        'InputFormat','dd-MMM-yyyyHH:mm:ss');
     
+    % due to a change in behavior of readtable sometime around 2016 (with
+    % the way the function handles automatic conversion of text to datetime
+    % objects, we get a year which is off by two millenia
+    
+    % could go back and specify the entire formatSpec for readtable, but
+    % don't really have time right now (that would be the *right* way to do
+    % it)
+    
+    % so, correct, assuming we are in 20xx
+    
+    timestamp_local = timestamp_local_uncorrected + years (2000);
+
     % compensate for salinity
     % formula, see Aanderaa 4531 (TD296) manual, p. 21
     
@@ -194,14 +209,17 @@ for i=1:size(Iselin_Nov16_Model_B_PHORCYS_met_rates,1)
         'Ambient','Ambient - linear trend');
     ylabel('Dissolved oxygen (uM)');
     datetick('x','dd mmm yy HH:MM');
-    set(gca,'XLim',[datenum(timestamp_local(1)) datenum(timestamp_local(length(timestamp_local)))]);
+    set(gca,'XLim',[timestamp_local(1) timestamp_local(length(timestamp_local))]);
+    
+    % apparently no longer need to convert the dates and times using, e.g.,
+    % datenum(timestamp_local(1))
     
     h(2) = subplot(10,1,9:10); % lower plot
     
-    plot(datenum(timestamp_local),ambient_T_deg_C,'c-');
+    plot(timestamp_local,ambient_T_deg_C,'c-');
     ylabel('Temperature (deg. C)')
     datetick('x','dd mmm yy HH:MM');
-    set(gca,'XLim',[datenum(timestamp_local(1)) datenum(timestamp_local(length(timestamp_local)))]);
+    set(gca,'XLim',[timestamp_local(1) timestamp_local(length(timestamp_local))]);
     
     % save plot to file, if desired
             

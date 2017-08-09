@@ -3,7 +3,7 @@
 library(smatr)
 library(lmodel2)
 
-setwd("/Users/jrcollins/Code/DO_Instruments/PHORCYS/data/processed/")
+setwd("/Users/jamesrco/Code/DO_Instruments/PHORCYS/data/processed/")
 
 # read in data; create variables
 
